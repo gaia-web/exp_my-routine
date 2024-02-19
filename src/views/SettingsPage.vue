@@ -24,8 +24,7 @@
             label="Color Theme"
             aria-label="theme"
             interface="popover"
-            :value="selectValue"
-            @ionChange="selectChanges($event)"
+            v-model="themeType"
           >
             <ion-select-option value="system">System</ion-select-option>
             <ion-select-option value="dark">Dark</ion-select-option>
@@ -56,7 +55,6 @@ import {
   IonSelect,
   IonLabel,
   IonItem,
-  SelectCustomEvent,
   IonSelectOption,
   IonIcon,
   IonNote,
@@ -68,27 +66,32 @@ import {
   personCircleOutline,
   settingsOutline,
 } from "ionicons/icons";
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
+import { STORAGE_KEYS } from "../utils/constant";
 
-const selectValue = ref(localStorage.getItem("theme") ?? "system");
+const themeType = ref(
+  localStorage.getItem(STORAGE_KEYS.THEME_TYPE) ?? "system"
+);
+watch(themeType, () => {
+  localStorage.setItem(STORAGE_KEYS.THEME_TYPE, themeType.value);
+  updateTheme();
+});
 
-const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+onMounted(() => {
+  updateTheme();
+});
 
-const toggleDarkTheme = () => {
-  const currentThemeMode = localStorage.getItem("theme");
+const mediaPrefersDarkScheme = window.matchMedia(
+  "(prefers-color-scheme: dark)"
+);
+mediaPrefersDarkScheme.addEventListener("change", () => updateTheme());
+
+const updateTheme = () => {
+  const currentThemeMode = themeType.value;
   if (currentThemeMode === "system") {
-    document.body.classList.toggle("dark", prefersDark.matches);
+    document.body.classList.toggle("dark", mediaPrefersDarkScheme.matches);
   } else {
     document.body.classList.toggle("dark", currentThemeMode === "dark");
   }
-};
-
-toggleDarkTheme();
-
-prefersDark.addEventListener("change", () => toggleDarkTheme());
-
-const selectChanges = (ev: SelectCustomEvent) => {
-  localStorage.setItem("theme", ev.detail.value);
-  toggleDarkTheme();
 };
 </script>
