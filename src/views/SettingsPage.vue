@@ -68,6 +68,7 @@ import {
 } from "ionicons/icons";
 import { onMounted, ref, watch } from "vue";
 import { STORAGE_KEYS } from "../utils/constant";
+import { updateTheme } from "../utils/theme";
 
 const themeType = ref(
   localStorage.getItem(STORAGE_KEYS.THEME_TYPE) ?? "system"
@@ -80,19 +81,4 @@ watch(themeType, () => {
 onMounted(() => {
   updateTheme();
 });
-
-const mediaPrefersDarkScheme = window.matchMedia(
-  "(prefers-color-scheme: dark)"
-);
-mediaPrefersDarkScheme.addEventListener("change", () => updateTheme());
-
-const updateTheme = () => {
-  const currentThemeType = themeType.value;
-  let isDark = mediaPrefersDarkScheme.matches;
-  if (currentThemeType !== "system") {
-    isDark = currentThemeType === "dark";
-  }
-  document.body.classList.toggle("dark", isDark);
-  document.documentElement.style.colorScheme = isDark ? "dark" : "light";
-};
 </script>
