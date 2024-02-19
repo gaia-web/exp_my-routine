@@ -1,0 +1,8 @@
+{
+  "name": "routine",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite",
+  "id": "5fa42e2a"
+}
