@@ -15,12 +15,18 @@ export default defineConfig({
         name: "My Routine",
         short_name: "MyRoutine",
         start_url: "/",
+        background_color: "#ffffff",
         icons: [
           {
             src: "./icon.png",
             sizes: "144x144",
             type: "image/png",
             purpose: "any maskable",
+          },
+          {
+            src: "./splash.png",
+            sizes: "2732x2732",
+            type: "image/png",
           },
         ],
       },
