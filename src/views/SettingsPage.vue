@@ -87,11 +87,12 @@ const mediaPrefersDarkScheme = window.matchMedia(
 mediaPrefersDarkScheme.addEventListener("change", () => updateTheme());
 
 const updateTheme = () => {
-  const currentThemeMode = themeType.value;
-  if (currentThemeMode === "system") {
-    document.body.classList.toggle("dark", mediaPrefersDarkScheme.matches);
-  } else {
-    document.body.classList.toggle("dark", currentThemeMode === "dark");
+  const currentThemeType = themeType.value;
+  let isDark = mediaPrefersDarkScheme.matches;
+  if (currentThemeType !== "system") {
+    isDark = currentThemeType === "dark";
   }
+  document.body.classList.toggle("dark", isDark);
+  document.documentElement.style.colorScheme = isDark ? "dark" : "light";
 };
 </script>
