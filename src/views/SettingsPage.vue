@@ -77,8 +77,4 @@ watch(themeType, () => {
   localStorage.setItem(STORAGE_KEYS.THEME_TYPE, themeType.value);
   updateTheme();
 });
-
-onMounted(() => {
-  updateTheme();
-});
 </script>
