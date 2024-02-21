@@ -1,4 +1,4 @@
-import { STORAGE_KEYS, THEME } from "./constant";
+import { STORAGE_KEYS } from "./constant";
 
 const mediaPrefersDarkScheme = window.matchMedia(
   "(prefers-color-scheme: dark)"
