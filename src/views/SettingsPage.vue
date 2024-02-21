@@ -66,7 +66,7 @@ import {
   personCircleOutline,
   settingsOutline,
 } from "ionicons/icons";
-import { onMounted, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { STORAGE_KEYS } from "../utils/constant";
 import { updateTheme } from "../utils/theme";
 
