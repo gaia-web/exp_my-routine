@@ -69,12 +69,13 @@ import {
 import { ref, watch } from "vue";
 import { STORAGE_KEYS } from "../utils/constant";
 import { updateTheme } from "../utils/theme";
+import { appStorage } from "@/utils/storage";
 
 const themeType = ref(
   localStorage.getItem(STORAGE_KEYS.THEME_TYPE) ?? "system"
 );
-watch(themeType, () => {
-  localStorage.setItem(STORAGE_KEYS.THEME_TYPE, themeType.value);
+watch(themeType, async () => {
+  await appStorage.set(STORAGE_KEYS.THEME_TYPE, themeType.value);
   updateTheme();
 });
 </script>

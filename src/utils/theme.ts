@@ -1,13 +1,14 @@
 import { STORAGE_KEYS } from "./constant";
+import { appStorage } from "./storage";
 
 const mediaPrefersDarkScheme = window.matchMedia(
   "(prefers-color-scheme: dark)"
 );
 mediaPrefersDarkScheme.addEventListener("change", () => updateTheme());
 
-export const updateTheme = () => {
+export const updateTheme = async () => {
   const currentThemeType =
-    localStorage.getItem(STORAGE_KEYS.THEME_TYPE) ?? "system";
+    (await appStorage.get(STORAGE_KEYS.THEME_TYPE)) ?? "system";
   let isDark = mediaPrefersDarkScheme.matches;
   if (currentThemeType !== "system") {
     isDark = currentThemeType === "dark";
