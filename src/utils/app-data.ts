@@ -1,4 +1,5 @@
 export type RoutineRecord = {
+    date: Date;
     value?: boolean | number;
     notes?: string;
 }
