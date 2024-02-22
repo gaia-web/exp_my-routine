@@ -45,11 +45,11 @@
           <ion-item-divider>
             <ion-label>Data</ion-label>
           </ion-item-divider>
-          <ion-item button>
+          <ion-item button @click="importAppData">
             <ion-icon slot="start" :icon="openOutline"></ion-icon>
             <ion-label> Import App Data </ion-label>
           </ion-item>
-          <ion-item button>
+          <ion-item button @click="exportAppData">
             <ion-icon slot="start" :icon="saveOutline"></ion-icon>
             <ion-label> Export App Data </ion-label>
           </ion-item>
@@ -100,12 +100,13 @@ import {
   openOutline,
   personCircleOutline,
   settingsOutline,
-syncOutline,
+  syncOutline,
 } from "ionicons/icons";
 import { ref, watch } from "vue";
 import { STORAGE_KEYS } from "../utils/constant";
 import { updateTheme } from "../utils/theme";
 import { appStorage } from "@/utils/storage";
+import { AppData } from "@/utils/app-data";
 
 const themeType = ref(
   localStorage.getItem(STORAGE_KEYS.THEME_TYPE) ?? "system"
@@ -114,4 +115,30 @@ watch(themeType, async () => {
   await appStorage.set(STORAGE_KEYS.THEME_TYPE, themeType.value);
   updateTheme();
 });
+
+const importAppData = () => {
+  const inputElement = document.createElement("input");
+  inputElement.type = "file";
+  inputElement.addEventListener("input", async () => {
+    const file = inputElement.files?.[0];
+    if (!file) {
+      return;
+    }
+    // TODO add validation
+    await appStorage.set(STORAGE_KEYS.APP_DATA, JSON.parse(await file.text()));
+    // TODO use ionic alert and show errors if happend
+    alert('Imported');
+  });
+  inputElement.click();
+  inputElement.remove();
+};
+
+const exportAppData = async () => {
+  const appData: AppData = await appStorage.get(STORAGE_KEYS.APP_DATA);
+  const blob = new Blob([JSON.stringify(appData)]);
+  const aElement = document.createElement("a");
+  aElement.href = URL.createObjectURL(blob);
+  aElement.download = "AppData.json";
+  aElement.click();
+};
 </script>
