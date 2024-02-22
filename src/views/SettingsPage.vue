@@ -127,7 +127,7 @@ const importAppData = () => {
     // TODO add validation
     await appStorage.set(STORAGE_KEYS.APP_DATA, JSON.parse(await file.text()));
     // TODO use ionic alert and show errors if happend
-    alert('Imported');
+    alert("Imported");
   });
   inputElement.click();
   inputElement.remove();
