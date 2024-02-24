@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { IonButton, IonItem } from "@ionic/vue";
 defineProps({
   header: String,
 });

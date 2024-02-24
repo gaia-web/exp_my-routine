@@ -1,15 +1,14 @@
 export type RoutineRecord = {
-    date: Date;
-    value?: boolean | number;
-    notes?: string;
-}
+  date: Date;
+  value?: number;
+  notes?: string;
+};
 
 export type Routine = {
-    name: string;
-    records: RoutineRecord[];
-}
+  name: string;
+  records: RoutineRecord[];
+};
 
 export type AppData = {
-    routines: Routine[];
-}
-
+  routines: Routine[];
+};
