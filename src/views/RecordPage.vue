@@ -17,41 +17,43 @@
         </ion-toolbar>
       </ion-header>
 
-      <ion-item>
-        <WeekHeader :highlighted-day-index="5" />
-      </ion-item>
       <div v-if="!routines.length">Click bottom right to add new routines.</div>
       <ion-list>
         <ion-reorder-group
-          :diabled="false"
+          :disabled="!deleteViewEnabled"
           @ionItemReorder="handleReorder($event)"
         >
-            <!-- v-for="{ index, header } in routines.map((r, index) => {
-              return { header: r.name, index };
-            })" -->
-          <!-- <ion-item
-          >
-            <ion-label> Item 1 </ion-label> -->
-            <!-- <WeekItem v-if="routines.length" :key="index" :header="header" /> -->
-            <!-- <ion-reorder></ion-reorder>
-          </ion-item>
           <ion-item
-          > -->
-            <!-- <ion-label> Item 2 </ion-label> -->
-            <!-- <WeekItem v-if="routines.length" :key="index" :header="header" /> -->
-            <!-- <ion-reorder></ion-reorder> -->
-          <!-- </ion-item> -->
+            v-for="{ index, header } in routines.map((r, index) => {
+              return { header: r.name, index };
+            })"
+          >
+            <!-- checked="{{selectedIndexes[index]}}" -->
+            <ion-checkbox
+              v-if="deleteViewEnabled"
+              slot="start"
+              checked="{{selectedIndexes[0]}}"
+              @click="weekItemSelected(index)"
+            ></ion-checkbox>
+            <WeekItem v-if="routines.length" :key="index" :header="header" />
+            <ion-reorder slot="end"></ion-reorder>
+          </ion-item>
         </ion-reorder-group>
       </ion-list>
-      <ion-fab slot="fixed" horizontal="end" vertical="bottom">
+      <ion-fab
+        slot="fixed"
+        horizontal="end"
+        vertical="bottom"
+        @click="toggleEditView"
+      >
         <ion-fab-button title="fab-list-toggle">
           <ion-icon :icon="pencil"></ion-icon>
         </ion-fab-button>
         <ion-fab-list side="top">
           <ion-fab-button title="Add" @click="openModal">
-            <ion-icon :icon="pencil"></ion-icon>
+            <ion-icon :icon="add"></ion-icon>
           </ion-fab-button>
-          <ion-fab-button title="Delete" @click="toggleDeleteView">
+          <ion-fab-button title="Delete" @click="deleteRoutines">
             <ion-icon :icon="close"></ion-icon>
           </ion-fab-button>
         </ion-fab-list>
@@ -77,9 +79,10 @@ import {
   modalController,
   IonReorder,
   IonFabList,
+  IonLabel,
   IonReorderGroup,
 } from "@ionic/vue";
-import { pencil, calendar, close } from "ionicons/icons";
+import { pencil, calendar, close, add } from "ionicons/icons";
 import WeekHeader from "@/components/WeekHeader.vue";
 import WeekItem from "@/components/WeekItem.vue";
 import RoutineModal from "./RoutineModal.vue";
@@ -88,7 +91,9 @@ import { AppData, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
 import { watch, onMounted, ref } from "vue";
 
-const selectedIndex = ref([] as number[]);
+const selectedIndexes = ref([] as Boolean[]);
+const fabOpen = ref(false);
+const reorderViewEnabled = ref(false);
 const deleteViewEnabled = ref(false);
 const routines = ref([] as Routine[]);
 let appDataRef = {} as AppData;
@@ -100,31 +105,50 @@ onMounted(async () => {
 
   appDataRef = appData ?? { routines: [] };
   routines.value = appDataRef?.routines ?? [];
+  selectedIndexes.value = new Array<Boolean>(appDataRef.routines.length).fill(
+    false
+  );
 });
 
-const handleReorder = (event: CustomEvent) => {
+const handleReorder = async (event: CustomEvent) => {
   // The `from` and `to` properties contain the index of the item
   // when the drag started and ended, respectively
-  console.log("Dragged from index", event.detail.from, "to", event.detail.to);
+  console.log(
+    appDataRef,
+    "Dragged from index",
+    event.detail.from,
+    "to",
+    event.detail.to
+  );
+
+  const from = appDataRef.routines[event.detail.from];
+  const to = appDataRef.routines[event.detail.to];
+
+  appDataRef.routines[event.detail.from] = to;
+  appDataRef.routines[event.detail.to] = from;
 
   // Finish the reorder and position the item in the DOM based on
   // where the gesture ended. This method can also be called directly
   // by the reorder group
   event.detail.complete();
+
+  await appStorage.set(STORAGE_KEYS.APP_DATA, appDataRef);
 };
 
-const toggleDeleteView = () => {
-  console.log("toggle clicked");
-  deleteViewEnabled.value = true;
-  console.log(2, deleteViewEnabled.value);
+const weekItemSelected = (index: number) => {
+  console.log(index);
+  selectedIndexes.value[index] = !selectedIndexes.value[index];
+  console.log(selectedIndexes.value);
 };
 
-watch(deleteViewEnabled, () => {
-  // what?
-  console.log(3, deleteViewEnabled.value);
-});
+const deleteRoutines = () => {
+  console.log(selectedIndexes.value);
+};
 
-console.log(4, deleteViewEnabled.value);
+const toggleEditView = () => {
+  deleteViewEnabled.value = !deleteViewEnabled.value;
+  fabOpen.value = true;
+};
 
 const openModal = async () => {
   const modal = await modalController.create({
