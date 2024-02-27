@@ -28,11 +28,10 @@
               return { header: r.name, index };
             })"
           >
-            <!-- checked="{{selectedIndexes[index]}}" -->
             <ion-checkbox
               v-if="deleteViewEnabled"
               slot="start"
-              bind:checked="selectedIndexes[index]"
+              v-model:checked=selectedIndexes[index]
               @click="weekItemSelected(index)"
             ></ion-checkbox>
             <WeekItem v-if="routines.length" :key="index" :header="header" />
