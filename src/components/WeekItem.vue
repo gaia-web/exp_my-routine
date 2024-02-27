@@ -1,5 +1,5 @@
 <template>
-  <ion-item>
+  <!-- <ion-item> -->
     <div style="width: 100%">
       <div>{{ header }}</div>
       <div style="display: flex">
@@ -11,7 +11,7 @@
         ></ion-button>
       </div>
     </div>
-  </ion-item>
+  <!-- </ion-item> -->
 </template>
 
 <script setup lang="ts">
