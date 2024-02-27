@@ -23,18 +23,20 @@
           :disabled="!deleteViewEnabled"
           @ionItemReorder="handleReorder($event)"
         >
-          <ion-item
-            v-for="{ index, header } in routines.map((r, index) => {
-              return { header: r.name, index };
-            })"
-          >
+          <ion-item v-for="(routine, index) in routines">
             <ion-checkbox
               v-if="deleteViewEnabled"
               slot="start"
-              v-model:checked="selectedIndexes[index]"
-              @click="weekItemSelected(index)"
+              v-model="routine.selected"
+              @ionChange="
+                console.log(routines) // TODO to be deleted
+              "
             ></ion-checkbox>
-            <WeekItem v-if="routines.length" :key="index" :header="header" />
+            <WeekItem
+              v-if="routines.length"
+              :key="index"
+              :header="routine.name"
+            />
             <ion-reorder slot="end"></ion-reorder>
           </ion-item>
         </ion-reorder-group>
@@ -80,6 +82,7 @@ import {
   IonFabList,
   IonLabel,
   IonReorderGroup,
+  IonCheckbox,
 } from "@ionic/vue";
 import { pencil, calendar, close, add } from "ionicons/icons";
 import WeekHeader from "@/components/WeekHeader.vue";
@@ -90,11 +93,15 @@ import { AppData, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
 import { watch, onMounted, ref } from "vue";
 
-const selectedIndexes = ref([] as Boolean[]);
+type SelectableRoutine = Routine & {
+  selected?: boolean;
+};
+
+const selectedIndices = ref([] as Boolean[]);
 const fabOpen = ref(false);
 const reorderViewEnabled = ref(false);
 const deleteViewEnabled = ref(false);
-const routines = ref([] as Routine[]);
+const routines = ref([] as SelectableRoutine[]);
 let appDataRef = {} as AppData;
 
 console.log(deleteViewEnabled.value);
@@ -104,7 +111,7 @@ onMounted(async () => {
 
   appDataRef = appData ?? { routines: [] };
   routines.value = appDataRef?.routines ?? [];
-  selectedIndexes.value = new Array<Boolean>(appDataRef.routines.length).fill(
+  selectedIndices.value = new Array<Boolean>(appDataRef.routines.length).fill(
     false
   );
 });
@@ -136,12 +143,12 @@ const handleReorder = async (event: CustomEvent) => {
 
 const weekItemSelected = (index: number) => {
   console.log(index);
-  selectedIndexes.value[index] = !selectedIndexes.value[index];
-  console.log(selectedIndexes.value);
+  selectedIndices.value[index] = !selectedIndices.value[index];
+  console.log(selectedIndices.value);
 };
 
 const deleteRoutines = () => {
-  console.log(selectedIndexes.value);
+  console.log(selectedIndices.value);
 };
 
 const toggleEditView = () => {
