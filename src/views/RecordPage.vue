@@ -32,7 +32,7 @@
             <ion-checkbox
               v-if="deleteViewEnabled"
               slot="start"
-              checked="{{selectedIndexes[0]}}"
+              checked="{{selectedIndexes[index]}}"
               @click="weekItemSelected(index)"
             ></ion-checkbox>
             <WeekItem v-if="routines.length" :key="index" :header="header" />
