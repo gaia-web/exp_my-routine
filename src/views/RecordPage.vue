@@ -20,13 +20,12 @@
       <ion-item>
         <WeekHeader :highlighted-day-index="5" />
       </ion-item>
-      <div v-if="!routines.length">
+      <div v-if="!appData?.routines.length">
         Click bottom right + to add new routine.
       </div>
       <ion-list>
         <WeekItem
-          v-if="routines.length"
-          v-for="header in routines.map((r) => r.name)"
+          v-for="header in appData?.routines.map((r) => r.name)"
           :key="header"
           :header="header"
         />
@@ -65,14 +64,10 @@ import { AppData, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
 import { onMounted, ref } from "vue";
 
-const routines = ref([] as Routine[]);
-let appDataRef = {} as AppData;
+const appData = ref<AppData>();
 
 onMounted(async () => {
-  const appData: AppData = await appStorage.get(STORAGE_KEYS.APP_DATA);
-
-  appDataRef = appData ?? { routines: [] };
-  routines.value = appDataRef?.routines ?? [];
+  appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
 });
 
 const openModal = async () => {
@@ -86,9 +81,9 @@ const openModal = async () => {
 
   if (role === "confirm") {
     const newRoutine: Routine = { name: data["name"], records: [] };
-    routines.value.push(newRoutine);
+    appData.value?.routines.push(newRoutine);
 
-    await appStorage.set(STORAGE_KEYS.APP_DATA, appDataRef);
+    await appStorage.set(STORAGE_KEYS.APP_DATA, appData.value);
   }
 };
 </script>
