@@ -20,17 +20,14 @@
       <div v-if="!routines.length">Click bottom right to add new routines.</div>
       <ion-list>
         <ion-reorder-group
-          :disabled="!deleteViewEnabled"
+          :disabled="!editViewEnabled"
           @ionItemReorder="handleReorder($event)"
         >
           <ion-item v-for="(routine, index) in routines">
             <ion-checkbox
-              v-if="deleteViewEnabled"
+              v-if="editViewEnabled"
               slot="start"
               v-model="routine.selected"
-              @ionChange="
-                console.log(routines) // TODO to be deleted
-              "
             ></ion-checkbox>
             <WeekItem
               v-if="routines.length"
@@ -55,7 +52,7 @@
             <ion-icon :icon="add"></ion-icon>
           </ion-fab-button>
           <ion-fab-button title="Delete" @click="deleteRoutines">
-            <ion-icon :icon="close"></ion-icon>
+            <ion-icon :icon="trash"></ion-icon>
           </ion-fab-button>
         </ion-fab-list>
       </ion-fab>
@@ -80,12 +77,10 @@ import {
   modalController,
   IonReorder,
   IonFabList,
-  IonLabel,
   IonReorderGroup,
   IonCheckbox,
 } from "@ionic/vue";
-import { pencil, calendar, close, add } from "ionicons/icons";
-import WeekHeader from "@/components/WeekHeader.vue";
+import { pencil, calendar, trash, add } from "ionicons/icons";
 import WeekItem from "@/components/WeekItem.vue";
 import RoutineModal from "./RoutineModal.vue";
 import { appStorage } from "@/utils/storage";
@@ -97,63 +92,46 @@ type SelectableRoutine = Routine & {
   selected?: boolean;
 };
 
-const selectedIndices = ref([] as Boolean[]);
-const fabOpen = ref(false);
-const reorderViewEnabled = ref(false);
-const deleteViewEnabled = ref(false);
+const editViewEnabled = ref(false);
 const routines = ref([] as SelectableRoutine[]);
 let appDataRef = {} as AppData;
-
-console.log(deleteViewEnabled.value);
 
 onMounted(async () => {
   const appData: AppData = await appStorage.get(STORAGE_KEYS.APP_DATA);
 
   appDataRef = appData ?? { routines: [] };
-  routines.value = appDataRef?.routines ?? [];
-  selectedIndices.value = new Array<Boolean>(appDataRef.routines.length).fill(
-    false
-  );
+  routines.value = [...appDataRef?.routines] ?? [];
 });
 
 const handleReorder = async (event: CustomEvent) => {
-  // The `from` and `to` properties contain the index of the item
-  // when the drag started and ended, respectively
-  console.log(
-    appDataRef,
-    "Dragged from index",
-    event.detail.from,
-    "to",
-    event.detail.to
+  routines.value = event.detail.complete(routines.value);
+};
+
+const deleteRoutines = async () => {
+  for (let i = routines.value.length - 1; i >= 0; i--) {
+    if (routines.value[i].selected) {
+      appDataRef.routines.splice(i, 1);
+    }
+  }
+};
+
+watch(routines, () => {
+  appDataRef.routines = routines.value.map(
+    ({ name }) => ({ name, records: [] } as Routine)
   );
+});
 
-  const from = appDataRef.routines[event.detail.from];
-  const to = appDataRef.routines[event.detail.to];
+watch(editViewEnabled, async (_, closed) => {
+  if (closed) {
+    await appStorage.set(STORAGE_KEYS.APP_DATA, appDataRef.routines = routines.value.map(
+    ({ name }) => ({ name, records: [] } as Routine)
+  ));
+    routines.value = [...appDataRef?.routines] ?? [];
+  }
+});
 
-  appDataRef.routines[event.detail.from] = to;
-  appDataRef.routines[event.detail.to] = from;
-
-  // Finish the reorder and position the item in the DOM based on
-  // where the gesture ended. This method can also be called directly
-  // by the reorder group
-  event.detail.complete();
-
-  await appStorage.set(STORAGE_KEYS.APP_DATA, appDataRef);
-};
-
-const weekItemSelected = (index: number) => {
-  console.log(index);
-  selectedIndices.value[index] = !selectedIndices.value[index];
-  console.log(selectedIndices.value);
-};
-
-const deleteRoutines = () => {
-  console.log(selectedIndices.value);
-};
-
-const toggleEditView = () => {
-  deleteViewEnabled.value = !deleteViewEnabled.value;
-  fabOpen.value = true;
+const toggleEditView = async () => {
+  editViewEnabled.value = !editViewEnabled.value;
 };
 
 const openModal = async () => {
@@ -166,10 +144,14 @@ const openModal = async () => {
   const { data, role } = await modal.onWillDismiss();
 
   if (role === "confirm") {
-    const newRoutine: Routine = { name: data["name"], records: [] };
-    routines.value.push(newRoutine);
+    routines.value.push(createNewRoutine(data["name"]));
+    appDataRef.routines.push(createNewRoutine(data["name"]));
 
     await appStorage.set(STORAGE_KEYS.APP_DATA, appDataRef);
   }
+};
+
+const createNewRoutine = (name: string): Routine => {
+  return { name, records: [] };
 };
 </script>
