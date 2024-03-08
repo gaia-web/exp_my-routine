@@ -30,7 +30,7 @@
           <ion-reorder slot="end"></ion-reorder>
         </ion-item>
       </ion-reorder-group>
-      <div v-if="!appData?.routines.length">
+      <div v-if="!appData?.routines?.length">
         Click bottom right + to add new routine.
       </div>
       <ion-list>
@@ -99,35 +99,46 @@ const routines = ref([] as SelectableRoutine[]);
 
 onMounted(async () => {
   appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
-  // routines.value = [...appDataRef?.routines] ?? [];
+  if (appData.value?.routines) {
+    routines.value = [...appData.value.routines] ?? [];
+  }
 });
 
 const handleReorder = async (event: CustomEvent) => {
-  // routines.value = event.detail.complete(routines.value);
+  routines.value = event.detail.complete(routines.value);
 };
 
 const deleteRoutines = async () => {
-  // for (let i = routines.value.length - 1; i >= 0; i--) {
-  //   if (routines.value[i].selected) {
-  //     appDataRef.routines.splice(i, 1);
-  //   }
-  // }
+  if (appData.value?.routines) {
+    for (let i = routines.value.length - 1; i >= 0; i--) {
+      if (routines.value[i].selected) {
+        appData.value.routines.splice(i, 1);
+      }
+    }
+  }
 };
 
-// watch(routines, () => {
-//   appDataRef.routines = routines.value.map(
-//     ({ name }) => ({ name, records: [] } as Routine)
-//   );
-// });
+watch(routines, () => {
+  if (appData.value?.routines) {
+    appData.value.routines = routines.value.map(
+      ({ name }) => ({ name, records: [] } as Routine)
+    );
+  }
+});
 
-// watch(editViewEnabled, async (_, closed) => {
-//   if (closed) {
-//     await appStorage.set(STORAGE_KEYS.APP_DATA, appDataRef.routines = routines.value.map(
-//     ({ name }) => ({ name, records: [] } as Routine)
-//   ));
-//     routines.value = [...appDataRef?.routines] ?? [];
-//   }
-// });
+watch(editViewEnabled, async (_, closed) => {
+  if (appData.value?.routines) {
+    if (closed) {
+      await appStorage.set(
+        STORAGE_KEYS.APP_DATA,
+        (appData.value.routines = routines.value.map(
+          ({ name }) => ({ name, records: [] } as Routine)
+        ))
+      );
+      routines.value = [...appData.value.routines] ?? [];
+    }
+  }
+});
 
 const toggleEditView = async () => {
   editViewEnabled.value = !editViewEnabled.value;
@@ -143,11 +154,10 @@ const openModal = async () => {
   const { data, role } = await modal.onWillDismiss();
 
   if (role === "confirm") {
-    // routines.value.push(createNewRoutine(data["name"]));
-    // appDataRef.routines.push(createNewRoutine(data["name"]))
-    const newRoutine: Routine = { name: data["name"], records: [] };
-    appData.value?.routines.push(newRoutine);
+    appData.value?.routines.push(createNewRoutine(data["name"]));
+    routines.value.push(createNewRoutine(data["name"]));
 
+    debugger
     await appStorage.set(STORAGE_KEYS.APP_DATA, appData.value);
   }
 };
