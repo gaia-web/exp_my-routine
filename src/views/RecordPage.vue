@@ -16,27 +16,29 @@
           <ion-title size="large">Record</ion-title>
         </ion-toolbar>
       </ion-header>
-
-      <div v-if="!routines.length">Click bottom right to add new routines.</div>
+      <ion-reorder-group
+        :disabled="!editViewEnabled"
+        @ionItemReorder="handleReorder($event)"
+      >
+        <ion-item v-for="(routine, index) in routines">
+          <ion-checkbox
+            v-if="editViewEnabled"
+            slot="start"
+            v-model="routine.selected"
+          ></ion-checkbox>
+          <WeekHeader :highlighted-day-index="5" />
+          <ion-reorder slot="end"></ion-reorder>
+        </ion-item>
+      </ion-reorder-group>
+      <div v-if="!appData?.routines.length">
+        Click bottom right + to add new routine.
+      </div>
       <ion-list>
-        <ion-reorder-group
-          :disabled="!editViewEnabled"
-          @ionItemReorder="handleReorder($event)"
-        >
-          <ion-item v-for="(routine, index) in routines">
-            <ion-checkbox
-              v-if="editViewEnabled"
-              slot="start"
-              v-model="routine.selected"
-            ></ion-checkbox>
-            <WeekItem
-              v-if="routines.length"
-              :key="index"
-              :header="routine.name"
-            />
-            <ion-reorder slot="end"></ion-reorder>
-          </ion-item>
-        </ion-reorder-group>
+        <WeekItem
+          v-for="header in appData?.routines.map((r) => r.name)"
+          :key="header"
+          :header="header"
+        />
       </ion-list>
       <ion-fab
         slot="fixed"
@@ -88,47 +90,44 @@ import { AppData, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
 import { watch, onMounted, ref } from "vue";
 
+const appData = ref<AppData>();
+const editViewEnabled = ref(false);
 type SelectableRoutine = Routine & {
   selected?: boolean;
 };
-
-const editViewEnabled = ref(false);
 const routines = ref([] as SelectableRoutine[]);
-let appDataRef = {} as AppData;
 
 onMounted(async () => {
-  const appData: AppData = await appStorage.get(STORAGE_KEYS.APP_DATA);
-
-  appDataRef = appData ?? { routines: [] };
-  routines.value = [...appDataRef?.routines] ?? [];
+  appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
+  // routines.value = [...appDataRef?.routines] ?? [];
 });
 
 const handleReorder = async (event: CustomEvent) => {
-  routines.value = event.detail.complete(routines.value);
+  // routines.value = event.detail.complete(routines.value);
 };
 
 const deleteRoutines = async () => {
-  for (let i = routines.value.length - 1; i >= 0; i--) {
-    if (routines.value[i].selected) {
-      appDataRef.routines.splice(i, 1);
-    }
-  }
+  // for (let i = routines.value.length - 1; i >= 0; i--) {
+  //   if (routines.value[i].selected) {
+  //     appDataRef.routines.splice(i, 1);
+  //   }
+  // }
 };
 
-watch(routines, () => {
-  appDataRef.routines = routines.value.map(
-    ({ name }) => ({ name, records: [] } as Routine)
-  );
-});
+// watch(routines, () => {
+//   appDataRef.routines = routines.value.map(
+//     ({ name }) => ({ name, records: [] } as Routine)
+//   );
+// });
 
-watch(editViewEnabled, async (_, closed) => {
-  if (closed) {
-    await appStorage.set(STORAGE_KEYS.APP_DATA, appDataRef.routines = routines.value.map(
-    ({ name }) => ({ name, records: [] } as Routine)
-  ));
-    routines.value = [...appDataRef?.routines] ?? [];
-  }
-});
+// watch(editViewEnabled, async (_, closed) => {
+//   if (closed) {
+//     await appStorage.set(STORAGE_KEYS.APP_DATA, appDataRef.routines = routines.value.map(
+//     ({ name }) => ({ name, records: [] } as Routine)
+//   ));
+//     routines.value = [...appDataRef?.routines] ?? [];
+//   }
+// });
 
 const toggleEditView = async () => {
   editViewEnabled.value = !editViewEnabled.value;
@@ -144,10 +143,12 @@ const openModal = async () => {
   const { data, role } = await modal.onWillDismiss();
 
   if (role === "confirm") {
-    routines.value.push(createNewRoutine(data["name"]));
-    appDataRef.routines.push(createNewRoutine(data["name"]));
+    // routines.value.push(createNewRoutine(data["name"]));
+    // appDataRef.routines.push(createNewRoutine(data["name"]))
+    const newRoutine: Routine = { name: data["name"], records: [] };
+    appData.value?.routines.push(newRoutine);
 
-    await appStorage.set(STORAGE_KEYS.APP_DATA, appDataRef);
+    await appStorage.set(STORAGE_KEYS.APP_DATA, appData.value);
   }
 };
 
