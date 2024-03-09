@@ -25,9 +25,9 @@
       </div>
       <ion-list>
         <WeekItem
-          v-for="header in appData?.routines.map((r) => r.name)"
-          :key="header"
-          :header="header"
+          v-for="(routine, index) in appData?.routines"
+          :key="routine.name"
+          v-model:routine="(appData as AppData).routines[index]"
         />
       </ion-list>
       <ion-fab slot="fixed" horizontal="end" vertical="bottom">
@@ -62,7 +62,7 @@ import RoutineModal from "./RoutineModal.vue";
 import { appStorage } from "@/utils/storage";
 import { AppData, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, toRaw, watch } from "vue";
 
 const appData = ref<AppData>();
 
@@ -80,10 +80,18 @@ const openModal = async () => {
   const { data, role } = await modal.onWillDismiss();
 
   if (role === "confirm") {
-    const newRoutine: Routine = { name: data["name"], records: [] };
+    const newRoutine: Routine = { name: data["name"], records: {} };
     appData.value?.routines.push(newRoutine);
 
     await appStorage.set(STORAGE_KEYS.APP_DATA, appData.value);
   }
+};
+
+watch(appData, async () => {
+  await saveAppData();
+});
+
+const saveAppData = async () => {
+  await appStorage.set(STORAGE_KEYS.APP_DATA, toRaw(appData.value));
 };
 </script>

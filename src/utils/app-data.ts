@@ -2,14 +2,13 @@ import { STORAGE_KEYS } from "./constant";
 import { appStorage } from "./storage";
 
 export type RoutineRecord = {
-  date: Date;
   value?: number;
   notes?: string;
 };
 
 export type Routine = {
   name: string;
-  records: RoutineRecord[];
+  records: Record<string, RoutineRecord>;
 };
 
 export type AppData = {

@@ -12,24 +12,11 @@
 </template>
 
 <script setup lang="ts">
+import { getWeekDays, getWeekDayName } from "@/utils/day";
 import { ref } from "vue";
 
 const days = ref(getWeekDays());
 const locale = ref(navigator.language ?? "en-US");
-
-function getWeekDays() {
-  const weekDays = [];
-  const baseDate = new Date();
-  for (let i = 1; i <= 7; i++) {
-    weekDays.unshift(baseDate);
-    baseDate.setDate(baseDate.getDate() - 1);
-  }
-  return weekDays;
-}
-
-function getWeekDayName(day: Date, locale: string) {
-  return day.toLocaleDateString(locale, { weekday: "short" });
-}
 </script>
 
 <style scoped>
