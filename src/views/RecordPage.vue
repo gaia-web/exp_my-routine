@@ -17,8 +17,8 @@
         </ion-toolbar>
       </ion-header>
 
-      <ion-item>
-        <WeekHeader :highlighted-day-index="5" />
+      <ion-item style="position: sticky; z-index: 10; top: 0">
+        <WeekHeader />
       </ion-item>
       <div v-if="!appData?.routines.length">
         Click bottom right + to add new routine.
