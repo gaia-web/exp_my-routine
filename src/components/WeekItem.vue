@@ -1,10 +1,11 @@
 <template>
-  <div style="width: 100%">
-    <div>{{ routine?.name }}</div>
+  <div style="width: 100%; margin: 0.5em 0;">
+    <div style="font-size: 1.5em">{{ routine?.name }}</div>
     <div style="display: flex">
       <ion-button
         v-for="(day, index) in days"
         :key="index"
+        style="flex: 1"
         @click="handleDayClicked(day)"
         :color="getColor(routine?.records[day.toISOString().slice(0, 10)])"
         :fill="
@@ -93,7 +94,6 @@ const handleDayClicked = async (day: Date) => {
 };
 
 const getColor = (routineRecord?: RoutineRecord) => {
-  debugger;
   if (routineRecord?.value == null) {
     return "medium";
   }
@@ -106,9 +106,3 @@ const getColor = (routineRecord?: RoutineRecord) => {
   return "medium";
 };
 </script>
-
-<style scoped>
-ion-button {
-  flex: 1;
-}
-</style>

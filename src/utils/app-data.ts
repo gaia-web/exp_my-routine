@@ -15,7 +15,7 @@ export type AppData = {
   routines: Routine[];
 };
 
-const INITIAL_APP_DATA: AppData = {
+export const INITIAL_APP_DATA: AppData = {
   routines: [],
 };
 

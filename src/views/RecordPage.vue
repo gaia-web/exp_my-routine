@@ -16,24 +16,48 @@
           <ion-title size="large">Record</ion-title>
         </ion-toolbar>
       </ion-header>
-
       <ion-item style="position: sticky; z-index: 10; top: 0">
         <WeekHeader />
       </ion-item>
-      <div v-if="!appData?.routines.length">
+      <ion-list>
+        <ion-reorder-group
+          :disabled="!editingViewEnabled"
+          @ionItemReorder="handleReorder"
+        >
+          <ion-item
+            v-for="(routine, index) in appData.routines"
+            :key="routine.name"
+          >
+            <ion-checkbox
+              v-if="editingViewEnabled"
+              slot="start"
+              v-model="routineSelections[index]"
+            ></ion-checkbox>
+            <WeekItem v-model:routine="(appData as AppData).routines[index]" />
+            <ion-reorder slot="end"></ion-reorder>
+          </ion-item>
+        </ion-reorder-group>
+      </ion-list>
+      <div v-if="appData?.routines?.length <= 0">
         Click bottom right + to add new routine.
       </div>
-      <ion-list>
-        <WeekItem
-          v-for="(routine, index) in appData?.routines"
-          :key="routine.name"
-          v-model:routine="(appData as AppData).routines[index]"
-        />
-      </ion-list>
-      <ion-fab slot="fixed" horizontal="end" vertical="bottom">
-        <ion-fab-button title="Add" @click="openModal">
-          <ion-icon :icon="add"></ion-icon>
+      <ion-fab
+        slot="fixed"
+        horizontal="end"
+        vertical="bottom"
+        @click="toggleEditingView"
+      >
+        <ion-fab-button title="fab-list-toggle">
+          <ion-icon :icon="pencil"></ion-icon>
         </ion-fab-button>
+        <ion-fab-list side="top">
+          <ion-fab-button title="Add" @click="addRoutine">
+            <ion-icon :icon="add"></ion-icon>
+          </ion-fab-button>
+          <ion-fab-button title="Delete" @click="deleteRoutines">
+            <ion-icon :icon="trash"></ion-icon>
+          </ion-fab-button>
+        </ion-fab-list>
       </ion-fab>
     </ion-content>
   </ion-page>
@@ -53,43 +77,85 @@ import {
   IonFabButton,
   IonList,
   IonItem,
-  modalController,
+  IonReorder,
+  IonFabList,
+  IonReorderGroup,
+  IonCheckbox,
+  ItemReorderEventDetail,
+  alertController,
 } from "@ionic/vue";
-import { add, calendar } from "ionicons/icons";
+import { pencil, calendar, trash, add } from "ionicons/icons";
 import WeekHeader from "@/components/WeekHeader.vue";
 import WeekItem from "@/components/WeekItem.vue";
-import RoutineModal from "./RoutineModal.vue";
 import { appStorage } from "@/utils/storage";
-import { AppData, Routine } from "@/utils/app-data";
+import { AppData, INITIAL_APP_DATA, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
-import { onMounted, ref, toRaw, watch } from "vue";
+import { watch, onMounted, ref, toRaw } from "vue";
 
-const appData = ref<AppData>();
+const appData = ref<AppData>(INITIAL_APP_DATA);
+const editingViewEnabled = ref(false);
+const routineSelections = ref<boolean[]>([]);
+
+watch(editingViewEnabled, async (value) => {
+  if (value) {
+    routineSelections.value = [];
+    return;
+  }
+});
+
+watch(
+  appData,
+  async () => {
+    await saveAppData();
+  },
+  { deep: true }
+);
 
 onMounted(async () => {
   appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
 });
 
-const openModal = async () => {
-  const modal = await modalController.create({
-    component: RoutineModal,
-  });
-
-  modal.present();
-
-  const { data, role } = await modal.onWillDismiss();
-
-  if (role === "confirm") {
-    const newRoutine: Routine = { name: data["name"], records: {} };
-    appData.value?.routines.push(newRoutine);
-
-    await appStorage.set(STORAGE_KEYS.APP_DATA, appData.value);
-  }
+const toggleEditingView = () => {
+  editingViewEnabled.value = !editingViewEnabled.value;
 };
 
-watch(appData, async () => {
-  await saveAppData();
-});
+const addRoutine = async () => {
+  const alert = await alertController.create({
+    header: "Adding a new routine",
+    message: "Enter the routine name",
+    inputs: [{ name: "name", type: "text", placeholder: "Routine Name" }],
+    buttons: [
+      {
+        text: "Cancel",
+        role: "cancel",
+      },
+      {
+        text: "Add",
+        role: "confirm",
+        handler: ({ name }) => {
+          const routine = createNewRoutine(name);
+          appData.value?.routines.push(routine);
+        },
+      },
+    ],
+  });
+
+  await alert.present();
+};
+
+const handleReorder = (event: CustomEvent<ItemReorderEventDetail>) => {
+  appData.value.routines = event.detail.complete(appData.value?.routines);
+};
+
+const deleteRoutines = () => {
+  appData.value.routines = appData.value.routines.filter(
+    (_, i) => !routineSelections.value[i]
+  );
+};
+
+const createNewRoutine = (name: string): Routine => {
+  return { name, records: {} };
+};
 
 const saveAppData = async () => {
   await appStorage.set(STORAGE_KEYS.APP_DATA, toRaw(appData.value));
