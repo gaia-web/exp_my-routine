@@ -91,6 +91,7 @@ import { appStorage } from "@/utils/storage";
 import { AppData, INITIAL_APP_DATA, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
 import { watch, onMounted, ref, toRaw } from "vue";
+import { deepUnref } from "vue-deepunref";
 
 const appData = ref<AppData>(INITIAL_APP_DATA);
 const editingViewEnabled = ref(false);
@@ -98,7 +99,7 @@ const routineSelections = ref<boolean[]>([]);
 
 watch(editingViewEnabled, async (value) => {
   if (value) {
-    routineSelections.value = [];
+    routineSelections.value = new Array(appData.value.routines.length);
     return;
   }
 });
@@ -144,6 +145,12 @@ const addRoutine = async () => {
 };
 
 const handleReorder = (event: CustomEvent<ItemReorderEventDetail>) => {
+  const { from, to } = event.detail;
+  routineSelections.value.splice(
+    to,
+    0,
+    routineSelections.value.splice(from, 1)[0]
+  );
   appData.value.routines = event.detail.complete(appData.value?.routines);
 };
 
@@ -158,6 +165,6 @@ const createNewRoutine = (name: string): Routine => {
 };
 
 const saveAppData = async () => {
-  await appStorage.set(STORAGE_KEYS.APP_DATA, toRaw(appData.value));
+  await appStorage.set(STORAGE_KEYS.APP_DATA, deepUnref(appData.value));
 };
 </script>
