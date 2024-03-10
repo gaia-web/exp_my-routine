@@ -89,6 +89,7 @@ import { appStorage } from "@/utils/storage";
 import { AppData, INITIAL_APP_DATA, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
 import { watch, onMounted, ref, toRaw } from "vue";
+import { deepUnref } from "vue-deepunref";
 
 const appData = ref<AppData>(INITIAL_APP_DATA);
 const editingViewEnabled = ref(false);
@@ -156,6 +157,6 @@ const createNewRoutine = (name: string): Routine => {
 };
 
 const saveAppData = async () => {
-  await appStorage.set(STORAGE_KEYS.APP_DATA, toRaw(appData.value));
+  await appStorage.set(STORAGE_KEYS.APP_DATA, deepUnref(appData.value));
 };
 </script>
