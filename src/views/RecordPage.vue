@@ -96,7 +96,7 @@ const routineSelections = ref<boolean[]>([]);
 
 watch(editingViewEnabled, async (value) => {
   if (value) {
-    routineSelections.value = [];
+    routineSelections.value = new Array(appData.value.routines.length);
     return;
   }
   await saveAppData();
@@ -136,6 +136,12 @@ const addRoutine = async () => {
 };
 
 const handleReorder = (event: CustomEvent<ItemReorderEventDetail>) => {
+  const { from, to } = event.detail;
+  routineSelections.value.splice(
+    to,
+    0,
+    routineSelections.value.splice(from, 1)[0]
+  );
   appData.value.routines = event.detail.complete(appData.value?.routines);
 };
 
