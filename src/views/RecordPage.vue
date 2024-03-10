@@ -165,6 +165,6 @@ const createNewRoutine = (name: string): Routine => {
 };
 
 const saveAppData = async () => {
-  await appStorage.set(STORAGE_KEYS.APP_DATA, deepUnref(appData.value));
+  await appStorage.set(STORAGE_KEYS.APP_DATA, deepUnref(appData));
 };
 </script>
