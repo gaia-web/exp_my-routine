@@ -4,6 +4,15 @@
       <ion-toolbar>
         <ion-title>Record</ion-title>
         <ion-buttons slot="end">
+          <ion-button
+            title="Previous Week"
+            @click="swiperRef?.swiper.slidePrev()"
+          >
+            <ion-icon slot="icon-only" :icon="arrowBack"></ion-icon>
+          </ion-button>
+          <ion-button title="Next Week" @click="swiperRef?.swiper.slideNext()">
+            <ion-icon slot="icon-only" :icon="arrowForward"></ion-icon>
+          </ion-button>
           <ion-button title="Toggle View">
             <ion-icon slot="icon-only" :icon="calendar"></ion-icon>
           </ion-button>
@@ -16,7 +25,7 @@
           <ion-title size="large">Record</ion-title>
         </ion-toolbar>
       </ion-header>
-      <swiper-container virtual="true" :initial-slide="9">
+      <swiper-container ref="swiperRef" virtual="true" :initial-slide="9">
         <ion-item style="position: sticky; z-index: 10; top: 0">
           <WeekHeader />
         </ion-item>
@@ -90,7 +99,14 @@ import {
   ItemReorderEventDetail,
   alertController,
 } from "@ionic/vue";
-import { pencil, calendar, trash, add } from "ionicons/icons";
+import {
+  pencil,
+  calendar,
+  trash,
+  add,
+  arrowBack,
+  arrowForward,
+} from "ionicons/icons";
 import WeekHeader from "@/components/WeekHeader.vue";
 import WeekItem from "@/components/WeekItem.vue";
 import { appStorage } from "@/utils/storage";
@@ -98,13 +114,18 @@ import { AppData, INITIAL_APP_DATA, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
 import { watch, onMounted, ref } from "vue";
 import { deepUnref } from "vue-deepunref";
-import { register as registerSwiper } from "swiper/element/bundle";
+import {
+  register as registerSwiper,
+  type SwiperContainer,
+} from "swiper/element/bundle";
 
 registerSwiper();
 
 const appData = ref<AppData>(INITIAL_APP_DATA);
 const editingViewEnabled = ref(false);
 const routineSelections = ref<boolean[]>([]);
+
+const swiperRef = ref<SwiperContainer>();
 
 watch(editingViewEnabled, async (value) => {
   if (value) {
