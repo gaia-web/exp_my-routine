@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; margin: 0.5em 0;">
+  <div style="width: 100%; margin-top: 2em">
     <div style="font-size: 1.5em">{{ routine?.name }}</div>
     <div style="display: flex">
       <ion-button
@@ -33,35 +33,48 @@ const days = ref(getWeekDays());
 const locale = ref(navigator.language ?? "en-US");
 
 const handleDayClicked = async (day: Date) => {
+  const value = routine.value.records[day.toISOString().slice(0, 10)]?.value;
   const alert = await alertController.create({
-    header: day.toLocaleDateString(locale.value),
-    subHeader: "Did you achieve your goal?",
+    header: `For ${routine.value.name}`,
+    subHeader: `on ${day.toLocaleDateString(locale.value)}`,
+    message: `What was the status of ${
+      routine.value.name
+    } on ${day.toLocaleDateString(locale.value)}?`,
     inputs: [
       {
         label: "Positive",
         type: "radio",
         value: "+",
+        checked: value != null && value > 0,
       },
       {
         label: "Neutral",
         type: "radio",
         value: "=",
+        checked: value != null && value == 0,
       },
       {
         label: "Negative",
         type: "radio",
         value: "-",
-      },
-      {
-        label: "Skip",
-        type: "radio",
-        value: "",
+        checked: value != null && value < 0,
       },
     ],
     buttons: [
       {
         text: "Cancel",
         role: "cancel",
+      },
+      {
+        text: "Skip",
+        role: "destructive",
+        handler: () => {
+          const key = day.toISOString().slice(0, 10);
+          if (!routine.value.records[key]) {
+            routine.value.records[key] = {};
+          }
+          routine.value.records[key].value = undefined;
+        },
       },
       {
         text: "Confirm",
@@ -80,9 +93,6 @@ const handleDayClicked = async (day: Date) => {
               break;
             case "=":
               routine.value.records[key].value = 0;
-              break;
-            default:
-              routine.value.records[key].value = undefined;
               break;
           }
         },
