@@ -16,31 +16,37 @@
           <ion-title size="large">Record</ion-title>
         </ion-toolbar>
       </ion-header>
-      <ion-item style="position: sticky; z-index: 10; top: 0">
-        <WeekHeader />
-      </ion-item>
-      <ion-list>
-        <ion-reorder-group
-          :disabled="!editingViewEnabled"
-          @ionItemReorder="handleReorder"
-        >
-          <ion-item
-            v-for="(routine, index) in appData.routines"
-            :key="routine.name"
-          >
-            <ion-checkbox
-              v-if="editingViewEnabled"
-              slot="start"
-              v-model="routineSelections[index]"
-            ></ion-checkbox>
-            <WeekItem v-model:routine="(appData as AppData).routines[index]" />
-            <ion-reorder slot="end"></ion-reorder>
-          </ion-item>
-        </ion-reorder-group>
-      </ion-list>
-      <div v-if="appData?.routines?.length <= 0">
-        Click bottom right + to add new routine.
-      </div>
+      <swiper-container virtual="true" :initial-slide="9">
+        <ion-item style="position: sticky; z-index: 10; top: 0">
+          <WeekHeader />
+        </ion-item>
+        <swiper-slide v-for="i in 10" :key="i">
+          <ion-list>
+            <div v-if="appData?.routines?.length <= 0">
+              Click bottom right + to add new routine.
+            </div>
+            <ion-reorder-group
+              :disabled="!editingViewEnabled"
+              @ionItemReorder="handleReorder"
+            >
+              <ion-item
+                v-for="(routine, index) in appData.routines"
+                :key="routine.name"
+              >
+                <ion-checkbox
+                  v-if="editingViewEnabled"
+                  slot="start"
+                  v-model="routineSelections[index]"
+                ></ion-checkbox>
+                <WeekItem
+                  v-model:routine="(appData as AppData).routines[index]"
+                />
+                <ion-reorder slot="end"></ion-reorder>
+              </ion-item>
+            </ion-reorder-group>
+          </ion-list>
+        </swiper-slide>
+      </swiper-container>
       <ion-fab
         slot="fixed"
         horizontal="end"
@@ -92,6 +98,9 @@ import { AppData, INITIAL_APP_DATA, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
 import { watch, onMounted, ref } from "vue";
 import { deepUnref } from "vue-deepunref";
+import { register as registerSwiper } from "swiper/element/bundle";
+
+registerSwiper();
 
 const appData = ref<AppData>(INITIAL_APP_DATA);
 const editingViewEnabled = ref(false);
