@@ -90,7 +90,7 @@ import WeekItem from "@/components/WeekItem.vue";
 import { appStorage } from "@/utils/storage";
 import { AppData, INITIAL_APP_DATA, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
-import { watch, onMounted, ref, toRaw } from "vue";
+import { watch, onMounted, ref } from "vue";
 import { deepUnref } from "vue-deepunref";
 
 const appData = ref<AppData>(INITIAL_APP_DATA);
