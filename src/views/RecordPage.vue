@@ -7,10 +7,15 @@
           <ion-button
             title="Previous Week"
             @click="swiperRef?.swiper.slidePrev()"
+            :disabled="isFirstSlideActive"
           >
             <ion-icon slot="icon-only" :icon="arrowBack"></ion-icon>
           </ion-button>
-          <ion-button title="Next Week" @click="swiperRef?.swiper.slideNext()">
+          <ion-button
+            title="Next Week"
+            @click="swiperRef?.swiper.slideNext()"
+            :disabled="isLastSlideActive"
+          >
             <ion-icon slot="icon-only" :icon="arrowForward"></ion-icon>
           </ion-button>
           <ion-button title="Toggle View">
@@ -25,11 +30,15 @@
           <ion-title size="large">Record</ion-title>
         </ion-toolbar>
       </ion-header>
-      <swiper-container ref="swiperRef" virtual="true" :initial-slide="9">
+      <swiper-container
+        ref="swiperRef"
+        virtual="true"
+        @swiperslidechange="handleSlideChange"
+      >
         <ion-item style="position: sticky; z-index: 10; top: 0">
           <WeekHeader />
         </ion-item>
-        <swiper-slide v-for="i in 10" :key="i">
+        <swiper-slide v-for="i in 3" :key="i">
           <ion-list>
             <div v-if="appData?.routines?.length <= 0">
               Click bottom right + to add new routine.
@@ -118,6 +127,7 @@ import {
   register as registerSwiper,
   type SwiperContainer,
 } from "swiper/element/bundle";
+import Swiper from "swiper";
 
 registerSwiper();
 
@@ -126,6 +136,8 @@ const editingViewEnabled = ref(false);
 const routineSelections = ref<boolean[]>([]);
 
 const swiperRef = ref<SwiperContainer>();
+const isFirstSlideActive = ref();
+const isLastSlideActive = ref();
 
 watch(editingViewEnabled, async (value) => {
   if (value) {
@@ -144,6 +156,7 @@ watch(
 
 onMounted(async () => {
   appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
+  swiperRef.value?.swiper.slideTo(swiperRef.value?.swiper.slides.length - 1);
 });
 
 const toggleEditingView = () => {
@@ -172,6 +185,11 @@ const addRoutine = async () => {
   });
 
   await alert.present();
+};
+
+const handleSlideChange = ({ detail: [swiper] }: CustomEvent<[Swiper]>) => {
+  isFirstSlideActive.value = swiper.isBeginning;
+  isLastSlideActive.value = swiper.isEnd;
 };
 
 const handleReorder = (event: CustomEvent<ItemReorderEventDetail>) => {
