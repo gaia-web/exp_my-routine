@@ -29,24 +29,32 @@
         style="
           min-height: 100%;
           display: grid;
-          grid-template-rows: auto 1fr;
+          grid-template-rows: auto auto 1fr;
           grid-template-columns: 100%;
         "
       >
-        <ion-header collapse="condense">
+        <ion-header collapse="condense" style="grid-row: 1">
           <ion-toolbar>
             <ion-title size="large">Record</ion-title>
           </ion-toolbar>
         </ion-header>
+        <ion-item
+          style="
+            position: sticky;
+            z-index: 10;
+            top: 0;
+            width: 100%;
+            grid-row: 2;
+          "
+        >
+          <WeekHeader />
+        </ion-item>
         <swiper-container
           ref="swiperRef"
           virtual="true"
-          style="width: 100%"
+          style="width: 100%; grid-row: 3"
           @swiperslidechange="handleSlideChange"
         >
-          <ion-item style="position: sticky; z-index: 10; top: 0">
-            <WeekHeader />
-          </ion-item>
           <swiper-slide v-for="i in 3" :key="i">
             <ion-list>
               <div v-if="appData?.routines?.length <= 0">
