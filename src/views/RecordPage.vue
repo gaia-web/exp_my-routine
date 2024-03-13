@@ -174,7 +174,17 @@ watch(
 
 onMounted(async () => {
   appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
-  swiperRef.value?.swiper.slideTo(swiperRef.value?.swiper.slides.length - 1);
+  const initializeSwiperIndex = () => {
+    const swiper = swiperRef.value?.swiper;
+    if (!swiper) {
+      setTimeout(() => {
+        initializeSwiperIndex();
+      });
+      return;
+    }
+    swiper.slideTo(swiper.slides.length - 1);
+  };
+  initializeSwiperIndex();
 });
 
 const toggleEditingView = () => {
