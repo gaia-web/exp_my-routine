@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; margin-top: 2em">
+  <div style="width: 100%; margin-top: 1em">
     <div style="font-size: 1.5em">{{ routine?.name }}</div>
     <div style="display: flex">
       <ion-button
