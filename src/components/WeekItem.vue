@@ -1,20 +1,29 @@
 <template>
-  <div style="width: 100%; margin-top: 2em">
-    <div style="font-size: 1.5em">{{ routine?.name }}</div>
-    <div style="display: flex">
-      <ion-button
-        v-for="(day, index) in days"
-        :key="index"
-        style="flex: 1"
-        @click="handleDayClicked(day)"
-        :color="getColor(routine?.records[day.toISOString().slice(0, 10)])"
-        :fill="
-          routine?.records[day.toISOString().slice(0, 10)]?.value != null
-            ? 'solid'
-            : 'outline'
-        "
-      >
-      </ion-button>
+  <div :style="{ width: '100%', marginTop: editingViewEnabled ? '0' : '2em' }">
+    <ion-input
+      v-if="editingViewEnabled"
+      label="Routine Name"
+      label-placement="stacked"
+      type="text"
+      v-model="routine.name"
+    ></ion-input>
+    <div v-else>
+      <div style="font-size: 1.5em">{{ routine?.name }}</div>
+      <div style="display: flex">
+        <ion-button
+          v-for="(day, index) in days"
+          :key="index"
+          style="flex: 1"
+          @click="handleDayClicked(day)"
+          :color="getColor(routine?.records[day.toISOString().slice(0, 10)])"
+          :fill="
+            routine?.records[day.toISOString().slice(0, 10)]?.value != null
+              ? 'solid'
+              : 'outline'
+          "
+        >
+        </ion-button>
+      </div>
     </div>
   </div>
 </template>
@@ -22,12 +31,16 @@
 <script setup lang="ts">
 import { Routine, RoutineRecord } from "@/utils/app-data";
 import { getWeekDays } from "@/utils/day";
-import { IonButton, alertController } from "@ionic/vue";
+import { IonButton, IonInput, alertController } from "@ionic/vue";
 import { ref } from "vue";
 
 const routine = defineModel<Routine>("routine", {
   required: true,
 });
+
+defineProps<{
+  editingViewEnabled: boolean;
+}>();
 
 const days = ref(getWeekDays());
 const locale = ref(navigator.language ?? "en-US");

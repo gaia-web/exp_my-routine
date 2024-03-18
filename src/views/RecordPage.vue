@@ -33,7 +33,10 @@
               slot="start"
               v-model="routineSelections[index]"
             ></ion-checkbox>
-            <WeekItem v-model:routine="(appData as AppData).routines[index]" />
+            <WeekItem
+              v-model:routine="(appData as AppData).routines[index]"
+              :editingViewEnabled="editingViewEnabled"
+            />
             <ion-reorder slot="end"></ion-reorder>
           </ion-item>
         </ion-reorder-group>
