@@ -16,7 +16,9 @@
           <ion-title size="large">Record</ion-title>
         </ion-toolbar>
       </ion-header>
-      <WeekHeader :highlighted-day-index="5" />
+      <ion-item style="position: sticky; z-index: 10; top: 0">
+        <WeekHeader />
+      </ion-item>
       <ion-list>
         <ion-reorder-group
           :disabled="!editingViewEnabled"
@@ -31,7 +33,7 @@
               slot="start"
               v-model="routineSelections[index]"
             ></ion-checkbox>
-            <WeekItem :key="routine.name" :header="routine.name" />
+            <WeekItem v-model:routine="(appData as AppData).routines[index]" />
             <ion-reorder slot="end"></ion-reorder>
           </ion-item>
         </ion-reorder-group>
@@ -88,7 +90,7 @@ import WeekItem from "@/components/WeekItem.vue";
 import { appStorage } from "@/utils/storage";
 import { AppData, INITIAL_APP_DATA, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
-import { watch, onMounted, ref, toRaw } from "vue";
+import { watch, onMounted, ref } from "vue";
 import { deepUnref } from "vue-deepunref";
 
 const appData = ref<AppData>(INITIAL_APP_DATA);
@@ -100,8 +102,15 @@ watch(editingViewEnabled, async (value) => {
     routineSelections.value = new Array(appData.value.routines.length);
     return;
   }
-  await saveAppData();
 });
+
+watch(
+  appData,
+  async () => {
+    await saveAppData();
+  },
+  { deep: true }
+);
 
 onMounted(async () => {
   appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
@@ -127,7 +136,6 @@ const addRoutine = async () => {
         handler: ({ name }) => {
           const routine = createNewRoutine(name);
           appData.value?.routines.push(routine);
-          saveAppData();
         },
       },
     ],
@@ -153,7 +161,7 @@ const deleteRoutines = () => {
 };
 
 const createNewRoutine = (name: string): Routine => {
-  return { name, records: [] };
+  return { name, records: {} };
 };
 
 const saveAppData = async () => {

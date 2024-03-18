@@ -3,21 +3,20 @@
     <div
       v-for="(day, index) in days"
       :key="index"
-      :class="{ item: true, highlight: highlightedDayIndex === index }"
+      :class="{ item: true, highlight: index === days.length - 1 }"
+      :title="day.toLocaleDateString(locale)"
     >
-      {{ day }}
+      {{ getWeekDayName(day, locale) }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { getWeekDays, getWeekDayName } from "@/utils/day";
 import { ref } from "vue";
 
-defineProps({
-  highlightedDayIndex: Number,
-});
-
-const days = ref(["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]);
+const days = ref(getWeekDays());
+const locale = ref(navigator.language ?? "en-US");
 </script>
 
 <style scoped>
