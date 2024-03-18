@@ -33,12 +33,23 @@
         </ion-item-group>
         <ion-item-group>
           <ion-item-divider>
-            <ion-label>About</ion-label>
+            <ion-label>General</ion-label>
           </ion-item-divider>
           <ion-item>
-            <ion-icon slot="start" :icon="hammerOutline"></ion-icon>
-            <ion-label> Version </ion-label>
-            <ion-note slot="end" color="medium">0.0.0</ion-note>
+            <ion-icon slot="start" :icon="settingsOutline"></ion-icon>
+            <ion-select label="First Day of Week" v-model="firstDayOfWeek">
+              <ion-select-option value="auto"
+                >Auto (today as last day)</ion-select-option
+              >
+              <ion-select-option
+                v-for="(day, index) in getWeekDays(
+                  getFirstDayOfWeek(new Date(), 1)
+                ).map((date) => getWeekDayName(date, locale, 'long'))"
+                :key="day"
+                :value="index + 1"
+                >{{ day }}</ion-select-option
+              >
+            </ion-select>
           </ion-item>
         </ion-item-group>
         <ion-item-group>
@@ -60,15 +71,12 @@
         </ion-item-group>
         <ion-item-group>
           <ion-item-divider>
-            <ion-label>Other</ion-label>
+            <ion-label>About</ion-label>
           </ion-item-divider>
-          <ion-item button>
-            <ion-icon slot="start" :icon="personCircleOutline"></ion-icon>
-            <ion-label> Account </ion-label>
-          </ion-item>
-          <ion-item button lines="none">
-            <ion-icon slot="start" :icon="settingsOutline"></ion-icon>
-            General
+          <ion-item>
+            <ion-icon slot="start" :icon="hammerOutline"></ion-icon>
+            <ion-label> Version </ion-label>
+            <ion-note slot="end" color="medium">0.0.0</ion-note>
           </ion-item>
         </ion-item-group>
       </ion-list>
@@ -98,7 +106,6 @@ import {
   hammerOutline,
   saveOutline,
   openOutline,
-  personCircleOutline,
   settingsOutline,
   syncOutline,
 } from "ionicons/icons";
@@ -107,6 +114,9 @@ import { STORAGE_KEYS } from "../utils/constant";
 import { updateTheme } from "../utils/theme";
 import { appStorage } from "@/utils/storage";
 import { AppData } from "@/utils/app-data";
+import { getWeekDays, getFirstDayOfWeek, getWeekDayName } from "@/utils/day";
+
+const locale = ref(navigator.language ?? "en-US");
 
 const themeType = ref(
   (await appStorage.get(STORAGE_KEYS.THEME_TYPE)) ?? "system"
@@ -114,6 +124,13 @@ const themeType = ref(
 watch(themeType, async () => {
   await appStorage.set(STORAGE_KEYS.THEME_TYPE, themeType.value);
   updateTheme();
+});
+
+const firstDayOfWeek = ref(
+  (await appStorage.get(STORAGE_KEYS.FIRST_DAY_OF_WEEK)) ?? "auto"
+);
+watch(firstDayOfWeek, async () => {
+  await appStorage.set(STORAGE_KEYS.FIRST_DAY_OF_WEEK, firstDayOfWeek.value);
 });
 
 const importAppData = () => {

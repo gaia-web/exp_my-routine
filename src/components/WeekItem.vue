@@ -13,6 +13,9 @@
             ? 'solid'
             : 'outline'
         "
+        :disabled="
+          day.toISOString().slice(0, 10) > new Date().toISOString().slice(0, 10)
+        "
       >
       </ion-button>
     </div>
@@ -21,15 +24,23 @@
 
 <script setup lang="ts">
 import { Routine, RoutineRecord } from "@/utils/app-data";
-import { getWeekDays } from "@/utils/day";
+import { STORAGE_KEYS } from "@/utils/constant";
+import { getFirstDayOfWeek, getWeekDays } from "@/utils/day";
+import { appStorage } from "@/utils/storage";
 import { IonButton, alertController } from "@ionic/vue";
 import { ref } from "vue";
+
+const firstDayOfWeek = +(await appStorage.get(STORAGE_KEYS.FIRST_DAY_OF_WEEK));
 
 const routine = defineModel<Routine>("routine", {
   required: true,
 });
 
-const days = ref(getWeekDays());
+const days = ref(
+  getWeekDays(
+    firstDayOfWeek > 0 ? getFirstDayOfWeek(new Date(), firstDayOfWeek) : void 0
+  )
+);
 const locale = ref(navigator.language ?? "en-US");
 
 const handleDayClicked = async (day: Date) => {

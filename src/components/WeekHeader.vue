@@ -12,10 +12,18 @@
 </template>
 
 <script setup lang="ts">
-import { getWeekDays, getWeekDayName } from "@/utils/day";
+import { STORAGE_KEYS } from "@/utils/constant";
+import { getWeekDays, getWeekDayName, getFirstDayOfWeek } from "@/utils/day";
+import { appStorage } from "@/utils/storage";
 import { ref } from "vue";
 
-const days = ref(getWeekDays());
+const firstDayOfWeek = +(await appStorage.get(STORAGE_KEYS.FIRST_DAY_OF_WEEK));
+
+const days = ref(
+  getWeekDays(
+    firstDayOfWeek > 0 ? getFirstDayOfWeek(new Date(), firstDayOfWeek) : void 0
+  )
+);
 const locale = ref(navigator.language ?? "en-US");
 </script>
 
