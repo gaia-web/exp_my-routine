@@ -3,14 +3,14 @@
     <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
       <ion-tab-bar slot="bottom">
-        <ion-tab-button tab="tab1" href="/record">
-          <ion-icon aria-hidden="true" :icon="pencil" />
-          <ion-label>Record</ion-label>
+        <ion-tab-button tab="routines" href="/routines">
+          <ion-icon aria-hidden="true" :icon="checkmarkDone" />
+          <ion-label>Routines</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="history" href="/history">
-          <ion-icon aria-hidden="true" :icon="barChart" />
-          <ion-label>History</ion-label>
+        <ion-tab-button tab="stats" href="/stats">
+          <ion-icon aria-hidden="true" :icon="statsChart" />
+          <ion-label>Stats</ion-label>
         </ion-tab-button>
 
         <ion-tab-button tab="settings" href="/settings">
@@ -32,5 +32,5 @@ import {
   IonPage,
   IonRouterOutlet,
 } from "@ionic/vue";
-import { barChart, pencil, settings } from "ionicons/icons";
+import { checkmarkDone, settings, statsChart } from "ionicons/icons";
 </script>
