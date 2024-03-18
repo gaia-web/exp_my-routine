@@ -1,8 +1,8 @@
 <template>
   <div id="container">
     <div
-      v-for="(day, index) in days"
-      :key="index"
+      v-for="day in days"
+      :key="day.toISOString().slice(0, 10)"
       :class="{
         item: true,
         highlight:

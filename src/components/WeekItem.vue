@@ -3,8 +3,8 @@
     <div style="font-size: 1.5em">{{ routine?.name }}</div>
     <div style="display: flex">
       <ion-button
-        v-for="(day, index) in days"
-        :key="index"
+        v-for="day in days"
+        :key="day.toISOString().slice(0, 10)"
         style="flex: 1"
         @click="handleDayClicked(day)"
         :color="getColor(routine?.records[day.toISOString().slice(0, 10)])"
