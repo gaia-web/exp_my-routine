@@ -24,24 +24,31 @@
 
 <script setup lang="ts">
 import { Routine, RoutineRecord } from "@/utils/app-data";
-import { STORAGE_KEYS } from "@/utils/constant";
 import { getFirstDayOfWeek, getWeekDays } from "@/utils/day";
-import { appStorage } from "@/utils/storage";
 import { IonButton, alertController } from "@ionic/vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
-const firstDayOfWeek = +(await appStorage.get(STORAGE_KEYS.FIRST_DAY_OF_WEEK));
+const props = defineProps({
+  firstDayOfWeek: Number,
+});
+
+watch(
+  () => props.firstDayOfWeek,
+  () => {
+    days.value = getWeekDays(
+      props.firstDayOfWeek && props.firstDayOfWeek > 0
+        ? getFirstDayOfWeek(new Date(), props.firstDayOfWeek)
+        : void 0
+    );
+  }
+);
+
+const days = ref();
+const locale = ref(navigator.language ?? "en-US");
 
 const routine = defineModel<Routine>("routine", {
   required: true,
 });
-
-const days = ref(
-  getWeekDays(
-    firstDayOfWeek > 0 ? getFirstDayOfWeek(new Date(), firstDayOfWeek) : void 0
-  )
-);
-const locale = ref(navigator.language ?? "en-US");
 
 const handleDayClicked = async (day: Date) => {
   const value = routine.value.records[day.toISOString().slice(0, 10)]?.value;

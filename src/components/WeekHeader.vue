@@ -17,18 +17,25 @@
 </template>
 
 <script setup lang="ts">
-import { STORAGE_KEYS } from "@/utils/constant";
 import { getWeekDays, getWeekDayName, getFirstDayOfWeek } from "@/utils/day";
-import { appStorage } from "@/utils/storage";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
-const firstDayOfWeek = +(await appStorage.get(STORAGE_KEYS.FIRST_DAY_OF_WEEK));
+const props = defineProps({
+  firstDayOfWeek: Number,
+});
 
-const days = ref(
-  getWeekDays(
-    firstDayOfWeek > 0 ? getFirstDayOfWeek(new Date(), firstDayOfWeek) : void 0
-  )
+watch(
+  () => props.firstDayOfWeek,
+  () => {
+    days.value = getWeekDays(
+      props.firstDayOfWeek && props.firstDayOfWeek > 0
+        ? getFirstDayOfWeek(new Date(), props.firstDayOfWeek)
+        : void 0
+    );
+  }
 );
+
+const days = ref();
 const locale = ref(navigator.language ?? "en-US");
 </script>
 

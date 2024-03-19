@@ -17,7 +17,7 @@
         </ion-toolbar>
       </ion-header>
       <ion-item style="position: sticky; z-index: 10; top: 0">
-        <WeekHeader />
+        <WeekHeader :firstDayOfWeek="firstDayOfWeek" />
       </ion-item>
       <ion-list>
         <ion-reorder-group
@@ -33,7 +33,10 @@
               slot="start"
               v-model="routineSelections[index]"
             ></ion-checkbox>
-            <WeekItem v-model:routine="(appData as AppData).routines[index]" />
+            <WeekItem
+              :firstDayOfWeek="firstDayOfWeek"
+              v-model:routine="(appData as AppData).routines[index]"
+            />
             <ion-reorder slot="end"></ion-reorder>
           </ion-item>
         </ion-reorder-group>
@@ -83,6 +86,7 @@ import {
   IonCheckbox,
   ItemReorderEventDetail,
   alertController,
+  onIonViewDidEnter,
 } from "@ionic/vue";
 import { pencil, calendar, trash, add } from "ionicons/icons";
 import WeekHeader from "@/components/WeekHeader.vue";
@@ -90,11 +94,12 @@ import WeekItem from "@/components/WeekItem.vue";
 import { appStorage } from "@/utils/storage";
 import { AppData, INITIAL_APP_DATA, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
-import { watch, onMounted, ref } from "vue";
+import { watch, ref } from "vue";
 import { deepUnref } from "vue-deepunref";
 
 const appData = ref<AppData>(INITIAL_APP_DATA);
 const editingViewEnabled = ref(false);
+const firstDayOfWeek = ref(Number.NaN);
 const routineSelections = ref<boolean[]>([]);
 
 watch(editingViewEnabled, async (value) => {
@@ -112,8 +117,11 @@ watch(
   { deep: true }
 );
 
-onMounted(async () => {
+onIonViewDidEnter(async () => {
   appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
+  firstDayOfWeek.value = +(await appStorage.get(
+    STORAGE_KEYS.FIRST_DAY_OF_WEEK
+  ));
 });
 
 const toggleEditingView = () => {
