@@ -12,7 +12,7 @@
         </ion-toolbar>
       </ion-header>
 
-      <ExploreContainer name="History page" />
+      Routine Name: {{ $route.params.routineName }}
     </ion-content>
   </ion-page>
 </template>
@@ -25,9 +25,8 @@ import {
   IonTitle,
   IonContent,
 } from "@ionic/vue";
-import ExploreContainer from "@/components/ExploreContainer.vue";
 
-setTimeout(() => {
-  alert(location.href);
+defineProps({
+  routineName: String,
 });
 </script>

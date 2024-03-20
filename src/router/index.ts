@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/SettingsPage.vue"),
       },
       {
-        path: "nfc",
+        path: "nfc/:routineName",
         component: () => import("@/views/NFCPage.vue"),
       }
     ],
