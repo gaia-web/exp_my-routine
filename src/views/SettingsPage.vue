@@ -158,7 +158,7 @@ const createNFCTag = async () => {
     header: "Create a NFC Tag",
     inputs: [
       {
-        name: "Routine Name",
+        name: "name",
         placeholder: "Routine Name",
         type: "text",
       },
@@ -172,6 +172,7 @@ const createNFCTag = async () => {
         text: "Confirm",
         role: "confirm",
         handler: async ({ name }) => {
+          debugger
           const records = [
             {
               recordType: "url",
