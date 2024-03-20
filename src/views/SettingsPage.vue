@@ -71,6 +71,15 @@
             General
           </ion-item>
         </ion-item-group>
+        <ion-item-group>
+          <ion-item-divider>
+            <ion-label>Experimental</ion-label>
+          </ion-item-divider>
+          <ion-item button @click="createNFCTag">
+            <ion-icon slot="start" :icon="pricetagOutline"></ion-icon>
+            <ion-label> create NFC tag </ion-label>
+          </ion-item>
+        </ion-item-group>
       </ion-list>
     </ion-content>
   </ion-page>
@@ -92,6 +101,7 @@ import {
   IonIcon,
   IonNote,
   IonList,
+  alertController,
 } from "@ionic/vue";
 import {
   contrastOutline,
@@ -101,6 +111,7 @@ import {
   personCircleOutline,
   settingsOutline,
   syncOutline,
+  pricetagOutline,
 } from "ionicons/icons";
 import { ref, watch } from "vue";
 import { STORAGE_KEYS } from "../utils/constant";
@@ -140,5 +151,55 @@ const exportAppData = async () => {
   aElement.href = URL.createObjectURL(blob);
   aElement.download = "AppData.json";
   aElement.click();
+};
+
+const createNFCTag = async () => {
+  const alert = await alertController.create({
+    header: "Create a NFC Tag",
+    inputs: [
+      {
+        name: "Routine Name",
+        placeholder: "Routine Name",
+        type: "text",
+      },
+    ],
+    buttons: [
+      {
+        text: "Cancel",
+        role: "cancel",
+      },
+      {
+        text: "Confirm",
+        role: "confirm",
+        handler: async ({ name }) => {
+          const records = [
+            {
+              recordType: "url",
+              data: `${window.location.origin}/nfc/${name}`,
+            },
+          ];
+          const reader = new NDEFReader();
+          const abortController = new AbortController();
+
+          reader.scan({ signal: abortController.signal });
+
+          try {
+            await reader.write(
+              { records },
+              {
+                overwrite: true,
+              }
+            );
+
+            setTimeout(() => abortController.abort(), 3000);
+            globalThis.alert("done writing tag");
+          } catch (e) {
+            globalThis.alert("error writing tag");
+          }
+        },
+      },
+    ],
+  });
+  await alert.present();
 };
 </script>
