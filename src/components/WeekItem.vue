@@ -7,11 +7,9 @@
         :key="index"
         style="flex: 1"
         @click="handleDayClicked(day)"
-        :color="getColor(routine?.records[day.toISOString().slice(0, 10)])"
+        :color="getColor(routine?.records[day.toString()])"
         :fill="
-          routine?.records[day.toISOString().slice(0, 10)]?.value != null
-            ? 'solid'
-            : 'outline'
+          routine?.records[day.toString()]?.value != null ? 'solid' : 'outline'
         "
       >
       </ion-button>
@@ -23,6 +21,7 @@
 import { Routine, RoutineRecord } from "@/utils/app-data";
 import { getWeekDays } from "@/utils/day";
 import { IonButton, alertController } from "@ionic/vue";
+import { Temporal } from "@js-temporal/polyfill";
 import { ref } from "vue";
 
 const routine = defineModel<Routine>("routine", {
@@ -32,14 +31,14 @@ const routine = defineModel<Routine>("routine", {
 const days = ref(getWeekDays());
 const locale = ref(navigator.language ?? "en-US");
 
-const handleDayClicked = async (day: Date) => {
-  const value = routine.value.records[day.toISOString().slice(0, 10)]?.value;
+const handleDayClicked = async (day: Temporal.PlainDate) => {
+  const value = routine.value.records[day.toString()]?.value;
   const alert = await alertController.create({
     header: `For ${routine.value.name}`,
-    subHeader: `on ${day.toLocaleDateString(locale.value)}`,
+    subHeader: `on ${day.toLocaleString(locale.value)}`,
     message: `What was the status of ${
       routine.value.name
-    } on ${day.toLocaleDateString(locale.value)}?`,
+    } on ${day.toLocaleString(locale.value)}?`,
     inputs: [
       {
         label: "Positive",
@@ -69,7 +68,7 @@ const handleDayClicked = async (day: Date) => {
         text: "Skip",
         role: "destructive",
         handler: () => {
-          const key = day.toISOString().slice(0, 10);
+          const key = day.toString();
           if (!routine.value.records[key]) {
             routine.value.records[key] = {};
           }
@@ -80,7 +79,7 @@ const handleDayClicked = async (day: Date) => {
         text: "Confirm",
         role: "confirm",
         handler: (value) => {
-          const key = day.toISOString().slice(0, 10);
+          const key = day.toString();
           if (!routine.value.records[key]) {
             routine.value.records[key] = {};
           }

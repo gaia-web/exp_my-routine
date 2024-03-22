@@ -4,7 +4,7 @@
       v-for="(day, index) in days"
       :key="index"
       :class="{ item: true, highlight: index === days.length - 1 }"
-      :title="day.toLocaleDateString(locale)"
+      :title="day.toLocaleString(locale)"
     >
       {{ getWeekDayName(day, locale) }}
     </div>
