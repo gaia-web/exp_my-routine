@@ -11,22 +11,41 @@
           <ion-title size="large">NFC</ion-title>
         </ion-toolbar>
       </ion-header>
-
-      Routine Name: {{ $route.params.routineName }}
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
+import { AppData } from "@/utils/app-data";
+import { STORAGE_KEYS } from "@/utils/constant";
+import { appStorage } from "@/utils/storage";
 import {
   IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
+  onIonViewDidEnter,
 } from "@ionic/vue";
+import { useRouter } from "vue-router";
 
-defineProps({
+const props = defineProps({
   routineName: String,
+});
+
+onIonViewDidEnter(async () => {
+  const appData = (await appStorage.get(STORAGE_KEYS.APP_DATA)) as
+    | AppData
+    | undefined;
+  const records = appData?.routines.find(
+    (routine) => routine.name === props.routineName
+  )?.records;
+  if (!records) {
+    alert("Invalid input.");
+    useRouter().replace({ name: "routines" });
+    return;
+  }
+  records[new Date().toISOString().slice(0, 10)].value = 1;
+  useRouter().replace({ name: "routines" });
 });
 </script>

@@ -177,7 +177,7 @@ const createNFCTag = async () => {
           const records = [
             {
               recordType: "url",
-              data: `${window.location.origin}/nfc/${name}`,
+              data: `${window.location.origin}/nfc/?routineName=${name}&value=1`,
             },
           ];
           const reader = new NDEFReader();
