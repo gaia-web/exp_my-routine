@@ -46,6 +46,7 @@ onIonViewDidEnter(async () => {
     return;
   }
   records[new Date().toISOString().slice(0, 10)].value = 1;
+  await appStorage.set(STORAGE_KEYS.APP_DATA, appData);
   useRouter().replace({ name: "routines" });
 });
 </script>
