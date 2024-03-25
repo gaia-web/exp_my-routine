@@ -31,6 +31,7 @@ import { useRouter } from "vue-router";
 
 const props = defineProps({
   routineName: String,
+  value: Number,
 });
 
 onIonViewDidEnter(async () => {
@@ -42,11 +43,11 @@ onIonViewDidEnter(async () => {
   )?.records;
   if (!records) {
     alert("Invalid input.");
-    useRouter().replace({ name: "routines" });
+    useRouter().replace({ name: "record" });
     return;
   }
-  records[new Date().toISOString().slice(0, 10)].value = 1;
+  records[new Date().toISOString().slice(0, 10)].value = props.value;
   await appStorage.set(STORAGE_KEYS.APP_DATA, appData);
-  useRouter().replace({ name: "routines" });
+  useRouter().replace({ name: "record" });
 });
 </script>
