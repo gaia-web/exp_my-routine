@@ -75,9 +75,9 @@
           <ion-item-divider>
             <ion-label>Experimental</ion-label>
           </ion-item-divider>
-          <ion-item button @click="createNFCTag">
+          <ion-item button @click="createNFCTag" :disabled="!nfcSupported">
             <ion-icon slot="start" :icon="pricetagOutline"></ion-icon>
-            <ion-label> create NFC tag </ion-label>
+            <ion-label> Create NFC tag </ion-label>
           </ion-item>
         </ion-item-group>
       </ion-list>
@@ -118,6 +118,8 @@ import { STORAGE_KEYS } from "../utils/constant";
 import { updateTheme } from "../utils/theme";
 import { appStorage } from "@/utils/storage";
 import { AppData } from "@/utils/app-data";
+
+const nfcSupported = ref(!!window.NDEFReader);
 
 const themeType = ref(
   localStorage.getItem(STORAGE_KEYS.THEME_TYPE) ?? "system"
@@ -172,7 +174,6 @@ const createNFCTag = async () => {
         text: "Confirm",
         role: "confirm",
         handler: async ({ name }) => {
-          debugger
           const records = [
             {
               recordType: "url",
