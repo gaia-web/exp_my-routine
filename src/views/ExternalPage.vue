@@ -34,6 +34,8 @@ const props = defineProps({
   value: Number,
 });
 
+const router = useRouter();
+
 onIonViewDidEnter(async () => {
   const appData = (await appStorage.get(STORAGE_KEYS.APP_DATA)) as
     | AppData
@@ -43,11 +45,11 @@ onIonViewDidEnter(async () => {
   )?.records;
   if (!records) {
     alert("Invalid input.");
-    useRouter().replace({ name: "record" });
+    router.replace({ name: "record" });
     return;
   }
-  records[new Date().toISOString().slice(0, 10)].value = props.value;
+  records[new Date().toISOString().slice(0, 10)] = { value: props.value };
   await appStorage.set(STORAGE_KEYS.APP_DATA, appData);
-  useRouter().replace({ name: "record" });
+  router.replace({ name: "record" });
 });
 </script>

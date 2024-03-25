@@ -27,9 +27,9 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/views/SettingsPage.vue"),
       },
       {
-        name: "nfc",
-        path: "nfc",
-        component: () => import("@/views/NFCPage.vue"),
+        name: "external",
+        path: "external",
+        component: () => import("@/views/ExternalPage.vue"),
         props: (route) => ({
           routineName: route.query.routineName,
           value: route.query.value,
