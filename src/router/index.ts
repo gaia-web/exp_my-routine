@@ -12,16 +12,28 @@ const routes: Array<RouteRecordRaw> = [
         redirect: "/record",
       },
       {
+        name: "record",
         path: "record",
         component: () => import("@/views/RecordPage.vue"),
       },
       {
+        name: "history",
         path: "history",
         component: () => import("@/views/HistoryPage.vue"),
       },
       {
+        name: "settings",
         path: "settings",
         component: () => import("@/views/SettingsPage.vue"),
+      },
+      {
+        name: "external",
+        path: "external",
+        component: () => import("@/views/ExternalPage.vue"),
+        props: (route) => ({
+          routineName: route.query.routineName,
+          value: route.query.value,
+        }),
       },
     ],
   },
