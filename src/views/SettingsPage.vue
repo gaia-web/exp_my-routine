@@ -109,7 +109,7 @@ import { appStorage } from "@/utils/storage";
 import { AppData } from "@/utils/app-data";
 
 const themeType = ref(
-  localStorage.getItem(STORAGE_KEYS.THEME_TYPE) ?? "system"
+  (await appStorage.get(STORAGE_KEYS.THEME_TYPE)) ?? "system"
 );
 watch(themeType, async () => {
   await appStorage.set(STORAGE_KEYS.THEME_TYPE, themeType.value);
