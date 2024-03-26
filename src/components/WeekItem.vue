@@ -1,5 +1,5 @@
 <template>
-  <div :style="{ width: '100%', marginTop: editingViewEnabled ? '0' : '2em' }">
+  <div :style="{ width: '100%', marginTop: editingViewEnabled ? '0' : '1em' }">
     <ion-input
       v-if="editingViewEnabled"
       label="Routine Name"
