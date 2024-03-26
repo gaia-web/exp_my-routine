@@ -1,13 +1,14 @@
+import { Temporal } from "@js-temporal/polyfill";
+
 export function getWeekDays() {
   const weekDays = [];
   for (let i = 0; i < 7; i++) {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
+    const date = Temporal.Now.plainDateISO().add({ days: -i });
     weekDays.unshift(date);
   }
   return weekDays;
 }
 
-export function getWeekDayName(day: Date, locale: string) {
-  return day.toLocaleDateString(locale, { weekday: "short" });
+export function getWeekDayName(day: Temporal.PlainDate, locale: string) {
+  return day.toLocaleString(locale, { weekday: "short" });
 }
