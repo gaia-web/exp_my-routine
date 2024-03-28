@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Record</ion-title>
+        <ion-title>Routines</ion-title>
         <ion-buttons slot="end">
           <ion-button
             title="Previous Week"
@@ -35,7 +35,7 @@
       >
         <ion-header collapse="condense" style="grid-row: 1">
           <ion-toolbar>
-            <ion-title size="large">Record</ion-title>
+            <ion-title size="large">Routines</ion-title>
           </ion-toolbar>
         </ion-header>
         <ion-item
