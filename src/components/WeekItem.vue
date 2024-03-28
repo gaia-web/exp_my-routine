@@ -1,16 +1,17 @@
 <template>
-  <div style="width: 100%; margin-top: 2em">
+  <div style="width: 100%; margin-top: 1em">
     <div style="font-size: 1.5em">{{ routine?.name }}</div>
     <div style="display: flex">
       <ion-button
-        v-for="(day, index) in days"
-        :key="index"
+        v-for="day in days"
+        :key="day.toString()"
         style="flex: 1"
         @click="handleDayClicked(day)"
         :color="getColor(routine?.records[day.toString()])"
         :fill="
           routine?.records[day.toString()]?.value != null ? 'solid' : 'outline'
         "
+        :disabled="day.toString() > Temporal.Now.plainDateISO().toString()"
       >
       </ion-button>
     </div>
@@ -19,17 +20,32 @@
 
 <script setup lang="ts">
 import { Routine, RoutineRecord } from "@/utils/app-data";
-import { getWeekDays } from "@/utils/day";
+import { getFirstDayOfWeek, getWeekDays } from "@/utils/day";
 import { IonButton, alertController } from "@ionic/vue";
 import { Temporal } from "@js-temporal/polyfill";
-import { ref } from "vue";
+import { ref, watch } from "vue";
+
+const props = defineProps({
+  firstDayOfWeek: Number,
+});
+
+watch(
+  () => props.firstDayOfWeek,
+  () => {
+    days.value = getWeekDays(
+      props.firstDayOfWeek && props.firstDayOfWeek > 0
+        ? getFirstDayOfWeek(Temporal.Now.plainDateISO(), props.firstDayOfWeek)
+        : void 0
+    );
+  }
+);
+
+const days = ref();
+const locale = ref(navigator.language ?? "en-US");
 
 const routine = defineModel<Routine>("routine", {
   required: true,
 });
-
-const days = ref(getWeekDays());
-const locale = ref(navigator.language ?? "en-US");
 
 const handleDayClicked = async (day: Temporal.PlainDate) => {
   const value = routine.value.records[day.toString()]?.value;

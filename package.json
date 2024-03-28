@@ -22,6 +22,7 @@
     "@ionic/vue-router": "^7.0.0",
     "@js-temporal/polyfill": "^0.4.4",
     "ionicons": "^7.0.0",
+    "swiper": "^11.0.7",
     "vue": "^3.3.0",
     "vue-deepunref": "^1.0.1",
     "vue-router": "^4.2.0"
