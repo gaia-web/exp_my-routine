@@ -47,7 +47,7 @@
             grid-row: 2;
           "
         >
-          <WeekHeader />
+          <WeekHeader :firstDayOfWeek="firstDayOfWeek" />
         </ion-item>
         <swiper-container
           ref="swiperRef"
@@ -74,8 +74,9 @@
                     v-model="routineSelections[index]"
                   ></ion-checkbox>
                   <WeekItem
-                    v-model:routine="(appData as AppData).routines[index]"
+                    :firstDayOfWeek="firstDayOfWeek"
                     :editingViewEnabled="editingViewEnabled"
+                    v-model:routine="(appData as AppData).routines[index]"
                   />
                   <ion-reorder slot="end"></ion-reorder>
                 </ion-item>
@@ -126,6 +127,7 @@ import {
   IonCheckbox,
   ItemReorderEventDetail,
   alertController,
+  onIonViewDidEnter,
 } from "@ionic/vue";
 import {
   pencil,
@@ -140,7 +142,7 @@ import WeekItem from "@/components/WeekItem.vue";
 import { appStorage } from "@/utils/storage";
 import { AppData, INITIAL_APP_DATA, Routine } from "@/utils/app-data";
 import { STORAGE_KEYS } from "@/utils/constant";
-import { watch, onMounted, ref } from "vue";
+import { watch, ref } from "vue";
 import { deepUnref } from "vue-deepunref";
 import {
   register as registerSwiper,
@@ -152,6 +154,7 @@ registerSwiper();
 
 const appData = ref<AppData>(INITIAL_APP_DATA);
 const editingViewEnabled = ref(false);
+const firstDayOfWeek = ref(Number.NaN);
 const routineSelections = ref<boolean[]>([]);
 
 const swiperRef = ref<SwiperContainer>();
@@ -173,8 +176,11 @@ watch(
   { deep: true }
 );
 
-onMounted(async () => {
+onIonViewDidEnter(async () => {
   appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
+  firstDayOfWeek.value = +(await appStorage.get(
+    STORAGE_KEYS.FIRST_DAY_OF_WEEK
+  ));
   const initializeSwiperIndex = () => {
     const swiper = swiperRef.value?.swiper;
     if (!swiper) {
