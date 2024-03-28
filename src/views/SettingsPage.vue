@@ -78,6 +78,9 @@
           <ion-item button @click="createNFCTag" :disabled="!nfcSupported">
             <ion-icon slot="start" :icon="pricetagOutline"></ion-icon>
             <ion-label> Create NFC tag </ion-label>
+            <ion-note v-if="!nfcSupported" slot="end"
+              >device not supported</ion-note
+            >
           </ion-item>
         </ion-item-group>
       </ion-list>
