@@ -5,6 +5,7 @@
         <ion-title>Record</ion-title>
         <ion-buttons slot="end">
           <ion-button
+            v-if="!editingViewEnabled"
             title="Previous Week"
             @click="swiperRef?.swiper.slidePrev()"
             :disabled="isFirstSlideActive"
@@ -12,6 +13,7 @@
             <ion-icon slot="icon-only" :icon="arrowBack"></ion-icon>
           </ion-button>
           <ion-button
+            v-if="!editingViewEnabled"
             title="Next Week"
             @click="swiperRef?.swiper.slideNext()"
             :disabled="isLastSlideActive"
@@ -74,11 +76,9 @@
                     v-model="routineSelections[index]"
                   ></ion-checkbox>
                   <WeekItem
-                   
-              :firstDayOfWeek="firstDayOfWeek"
-              v-model:routine="(appData as AppData).routines[index]"
-                 
-            />
+                    :firstDayOfWeek="firstDayOfWeek"
+                    v-model:routine="(appData as AppData).routines[index]"
+                  />
                   <ion-reorder slot="end"></ion-reorder>
                 </ion-item>
               </ion-reorder-group>
@@ -165,6 +165,10 @@ const isLastSlideActive = ref();
 watch(editingViewEnabled, async (value) => {
   if (value) {
     routineSelections.value = new Array(appData.value.routines.length);
+    const swiper = swiperRef.value?.swiper;
+    if (swiper) {
+      swiper.allowTouchMove = !value;
+    }
     return;
   }
 });
