@@ -74,11 +74,10 @@
                     v-model="routineSelections[index]"
                   ></ion-checkbox>
                   <WeekItem
-                   
-              :firstDayOfWeek="firstDayOfWeek"
-              v-model:routine="(appData as AppData).routines[index]"
-                 
-            />
+                    :firstDayOfWeek="firstDayOfWeek"
+                    :editingViewEnabled="editingViewEnabled"
+                    v-model:routine="(appData as AppData).routines[index]"
+                  />
                   <ion-reorder slot="end"></ion-reorder>
                 </ion-item>
               </ion-reorder-group>
