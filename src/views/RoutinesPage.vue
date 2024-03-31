@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Record</ion-title>
+        <ion-title>Routines</ion-title>
         <ion-buttons slot="end">
           <ion-button
             v-if="!editingViewEnabled"
@@ -37,7 +37,7 @@
       >
         <ion-header collapse="condense" style="grid-row: 1">
           <ion-toolbar>
-            <ion-title size="large">Record</ion-title>
+            <ion-title size="large">Routines</ion-title>
           </ion-toolbar>
         </ion-header>
         <ion-item
@@ -77,6 +77,7 @@
                   ></ion-checkbox>
                   <WeekItem
                     :firstDayOfWeek="firstDayOfWeek"
+                    :editingViewEnabled="editingViewEnabled"
                     v-model:routine="(appData as AppData).routines[index]"
                   />
                   <ion-reorder slot="end"></ion-reorder>
