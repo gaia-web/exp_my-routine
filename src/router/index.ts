@@ -9,15 +9,15 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: "",
-        redirect: "/record",
+        redirect: "/routines",
       },
       {
-        path: "record",
-        component: () => import("@/views/RecordPage.vue"),
+        path: "routines",
+        component: () => import("@/views/RoutinesPage.vue"),
       },
       {
-        path: "history",
-        component: () => import("@/views/HistoryPage.vue"),
+        path: "stats",
+        component: () => import("@/views/StatsPage.vue"),
       },
       {
         path: "settings",
