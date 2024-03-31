@@ -1,7 +1,7 @@
 <template>
   <div id="container">
     <div
-    v-for="day in days"
+      v-for="day in days"
       :key="day.toString()"
       :class="{
         item: true,
@@ -15,26 +15,14 @@
 </template>
 
 <script setup lang="ts">
-import { getWeekDays, getWeekDayName, getFirstDayOfWeek } from "@/utils/day";
+import { getWeekDayName } from "@/utils/day";
 import { Temporal } from "@js-temporal/polyfill";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
-const props = defineProps({
-  firstDayOfWeek: Number,
+defineProps({
+  days: Array<Temporal.PlainDate>,
 });
 
-watch(
-  () => props.firstDayOfWeek,
-  () => {
-    days.value = getWeekDays(
-      props.firstDayOfWeek && props.firstDayOfWeek > 0
-        ? getFirstDayOfWeek(Temporal.Now.plainDateISO(), props.firstDayOfWeek)
-        : void 0
-    );
-  }
-);
-
-const days = ref();
 const locale = ref(navigator.language ?? "en-US");
 </script>
 
