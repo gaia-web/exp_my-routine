@@ -1,15 +1,13 @@
 <template>
   <div id="container">
     <div
-      v-for="day in days"
-      :key="day.toISOString().slice(0, 10)"
+    v-for="day in days"
+      :key="day.toString()"
       :class="{
         item: true,
-        highlight:
-          day.toISOString().slice(0, 10) ===
-          new Date().toISOString().slice(0, 10),
+        highlight: day.toString() === Temporal.Now.plainDateISO().toString(),
       }"
-      :title="day.toLocaleDateString(locale)"
+      :title="day.toLocaleString(locale)"
     >
       {{ getWeekDayName(day, locale) }}
     </div>
@@ -18,6 +16,7 @@
 
 <script setup lang="ts">
 import { getWeekDays, getWeekDayName, getFirstDayOfWeek } from "@/utils/day";
+import { Temporal } from "@js-temporal/polyfill";
 import { ref, watch } from "vue";
 
 const props = defineProps({
@@ -29,7 +28,7 @@ watch(
   () => {
     days.value = getWeekDays(
       props.firstDayOfWeek && props.firstDayOfWeek > 0
-        ? getFirstDayOfWeek(new Date(), props.firstDayOfWeek)
+        ? getFirstDayOfWeek(Temporal.Now.plainDateISO(), props.firstDayOfWeek)
         : void 0
     );
   }

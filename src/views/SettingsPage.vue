@@ -43,7 +43,7 @@
               >
               <ion-select-option
                 v-for="(day, index) in getWeekDays(
-                  getFirstDayOfWeek(new Date(), 1)
+                  getFirstDayOfWeek(Temporal.Now.plainDateISO(), 1)
                 ).map((date) => getWeekDayName(date, locale, 'long'))"
                 :key="day"
                 :value="index + 1"
@@ -115,6 +115,7 @@ import { updateTheme } from "../utils/theme";
 import { appStorage } from "@/utils/storage";
 import { AppData } from "@/utils/app-data";
 import { getWeekDays, getFirstDayOfWeek, getWeekDayName } from "@/utils/day";
+import { Temporal } from "@js-temporal/polyfill";
 
 const locale = ref(navigator.language ?? "en-US");
 

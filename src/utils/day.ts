@@ -1,26 +1,29 @@
-const DAY_IN_MILLISECONDS = 24 * 60 * 60 * 1000;
+import { Temporal } from "@js-temporal/polyfill";
 
-export function getWeekDays(from?: Date) {
-  const startDate = from ?? new Date(Date.now() - 6 * DAY_IN_MILLISECONDS);
+export function getWeekDays(from?: Temporal.PlainDate) {
+  const startDate = from ?? Temporal.Now.plainDateISO().add({ days: -6 });
   const weekDays = [];
   for (let i = 0; i < 7; i++) {
-    const date = new Date(startDate.getTime() + i * DAY_IN_MILLISECONDS);
+    const date = startDate.add({ days: i });
     weekDays.push(date);
   }
   return weekDays;
 }
 
 export function getWeekDayName(
-  day: Date,
+  day: Temporal.PlainDate,
   locale: string,
   format: "long" | "short" | "narrow" = "short"
 ) {
-  return day.toLocaleDateString(locale, { weekday: format });
+  return day.toLocaleString(locale, { weekday: format });
 }
 
-export function getFirstDayOfWeek(date: Date, firstDayNumber: number) {
-  const firstDayOfWeek = new Date(
-    date.getTime() - ((7 - (firstDayNumber - 1)) % 7) * DAY_IN_MILLISECONDS
-  );
+export function getFirstDayOfWeek(
+  date: Temporal.PlainDate,
+  firstDayNumber: number
+) {
+  const firstDayOfWeek = date.add({
+    days: -1 * ((7 - (firstDayNumber - 1)) % 7),
+  });
   return firstDayOfWeek;
 }
