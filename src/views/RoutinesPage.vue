@@ -2,8 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title
-          >Routines -
+        <ion-title>
           {{
             Temporal.Now.plainDateISO()
               .add({
@@ -44,8 +43,7 @@
       >
         <ion-header collapse="condense" style="grid-row: 1">
           <ion-toolbar>
-            <ion-title size="large"
-              >Routines -
+            <ion-title size="large">
               {{
                 Temporal.Now.plainDateISO()
                   .add({
@@ -184,7 +182,7 @@ const routineSelections = ref<boolean[]>([]);
 const swiperRef = ref<SwiperContainer>();
 const isFirstSlideActive = ref();
 const isLastSlideActive = ref();
-const pageCount = ref(2);
+const pageCount = ref(3);
 const daysOfCurrentWeek = ref<Temporal.PlainDate[]>([]);
 const currentPageIndex = ref(0);
 
