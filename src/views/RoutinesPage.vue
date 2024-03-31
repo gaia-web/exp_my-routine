@@ -4,8 +4,8 @@
       <ion-toolbar>
         <ion-title>
           {{
-            Temporal.Now.plainDateISO()
-              .add({
+            daysOfCurrentWeek?.[0]
+              ?.add({
                 weeks: currentPageIndex + 1 - pageCount,
               })
               .toLocaleString(locale)
@@ -45,8 +45,8 @@
           <ion-toolbar>
             <ion-title size="large">
               {{
-                Temporal.Now.plainDateISO()
-                  .add({
+                daysOfCurrentWeek?.[0]
+                  ?.add({
                     weeks: currentPageIndex + 1 - pageCount,
                   })
                   .toLocaleString(locale)
