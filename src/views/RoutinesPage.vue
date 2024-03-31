@@ -182,7 +182,7 @@ const routineSelections = ref<boolean[]>([]);
 const swiperRef = ref<SwiperContainer>();
 const isFirstSlideActive = ref();
 const isLastSlideActive = ref();
-const pageCount = ref(3);
+const pageCount = ref(2);
 const daysOfCurrentWeek = ref<Temporal.PlainDate[]>([]);
 const currentPageIndex = ref(0);
 
