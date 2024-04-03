@@ -5,6 +5,7 @@
         <ion-title>Routines</ion-title>
         <ion-buttons slot="end">
           <ion-button
+            v-if="!editingViewEnabled"
             title="Previous Week"
             @click="swiperRef?.swiper.slidePrev()"
             :disabled="isFirstSlideActive"
@@ -12,6 +13,7 @@
             <ion-icon slot="icon-only" :icon="arrowBack"></ion-icon>
           </ion-button>
           <ion-button
+            v-if="!editingViewEnabled"
             title="Next Week"
             @click="swiperRef?.swiper.slideNext()"
             :disabled="isLastSlideActive"
@@ -164,6 +166,10 @@ const isLastSlideActive = ref();
 watch(editingViewEnabled, async (value) => {
   if (value) {
     routineSelections.value = new Array(appData.value.routines.length);
+    const swiper = swiperRef.value?.swiper;
+    if (swiper) {
+      swiper.allowTouchMove = !value;
+    }
     return;
   }
 });
