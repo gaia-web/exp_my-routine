@@ -31,28 +31,15 @@
 
 <script setup lang="ts">
 import { Routine, RoutineRecord } from "@/utils/app-data";
-import { getFirstDayOfWeek, getWeekDays } from "@/utils/day";
 import { IonButton, IonInput, alertController } from "@ionic/vue";
 import { Temporal } from "@js-temporal/polyfill";
-import { onMounted, ref, watch } from "vue";
+import { ref } from "vue";
 
-const days = ref();
 const locale = ref(navigator.language ?? "en-US");
 
-const props = defineProps({
-  firstDayOfWeek: Number,
+defineProps({
+  days: Array<Temporal.PlainDate>,
   editingViewEnabled: Boolean,
-});
-
-watch(
-  () => props.firstDayOfWeek,
-  () => {
-    days.value = getDays();
-  }
-);
-
-onMounted(() => {
-  days.value = getDays();
 });
 
 const routine = defineModel<Routine>("routine", {
@@ -142,12 +129,4 @@ const getColor = (routineRecord?: RoutineRecord) => {
   }
   return "medium";
 };
-
-function getDays() {
-  return getWeekDays(
-    props.firstDayOfWeek && props.firstDayOfWeek > 0
-      ? getFirstDayOfWeek(Temporal.Now.plainDateISO(), props.firstDayOfWeek)
-      : void 0
-  );
-}
 </script>

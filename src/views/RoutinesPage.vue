@@ -2,7 +2,15 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title>Routines</ion-title>
+        <ion-title>
+          {{
+            daysOfCurrentWeek?.[0]
+              ?.add({
+                weeks: currentPageIndex + 1 - pageCount,
+              })
+              .toLocaleString(locale)
+          }}</ion-title
+        >
         <ion-buttons slot="end">
           <ion-button
             v-if="!editingViewEnabled"
@@ -37,7 +45,15 @@
       >
         <ion-header collapse="condense" style="grid-row: 1">
           <ion-toolbar>
-            <ion-title size="large">Routines</ion-title>
+            <ion-title size="large">
+              {{
+                daysOfCurrentWeek?.[0]
+                  ?.add({
+                    weeks: currentPageIndex + 1 - pageCount,
+                  })
+                  .toLocaleString(locale)
+              }}</ion-title
+            >
           </ion-toolbar>
         </ion-header>
         <ion-item
@@ -49,15 +65,17 @@
             grid-row: 2;
           "
         >
-          <WeekHeader :firstDayOfWeek="firstDayOfWeek" />
+          <WeekHeader
+            :days="getAdjustedDays(currentPageIndex + 1 - pageCount)"
+          />
         </ion-item>
         <swiper-container
           ref="swiperRef"
           virtual="true"
           style="width: 100%; grid-row: 3"
-          @swiperslidechange="handleSlideChange"
+          @swiperslidechangetransitionend="handleSlideChange"
         >
-          <swiper-slide v-for="i in 3" :key="i">
+          <swiper-slide v-for="i in pageCount" :key="i" :virtualIndex="i">
             <ion-list>
               <div v-if="appData?.routines?.length <= 0">
                 Click bottom right + to add new routine.
@@ -76,7 +94,7 @@
                     v-model="routineSelections[index]"
                   ></ion-checkbox>
                   <WeekItem
-                    :firstDayOfWeek="firstDayOfWeek"
+                    :days="getAdjustedDays(i - pageCount)"
                     :editingViewEnabled="editingViewEnabled"
                     v-model:routine="(appData as AppData).routines[index]"
                   />
@@ -151,8 +169,12 @@ import {
   type SwiperContainer,
 } from "swiper/element/bundle";
 import Swiper from "swiper";
+import { getWeekDays, getFirstDayOfWeek } from "@/utils/day";
+import { Temporal } from "@js-temporal/polyfill";
 
 registerSwiper();
+
+const locale = ref(navigator.language ?? "en-US");
 
 const appData = ref<AppData>(INITIAL_APP_DATA);
 const editingViewEnabled = ref(false);
@@ -162,6 +184,9 @@ const routineSelections = ref<boolean[]>([]);
 const swiperRef = ref<SwiperContainer>();
 const isFirstSlideActive = ref();
 const isLastSlideActive = ref();
+const pageCount = ref(2);
+const daysOfCurrentWeek = ref<Temporal.PlainDate[]>([]);
+const currentPageIndex = ref(0);
 
 watch(editingViewEnabled, async (value) => {
   if (value) {
@@ -182,6 +207,14 @@ watch(
   { deep: true }
 );
 
+watch(firstDayOfWeek, () => {
+  daysOfCurrentWeek.value = getWeekDays(
+    firstDayOfWeek.value && firstDayOfWeek.value > 0
+      ? getFirstDayOfWeek(Temporal.Now.plainDateISO(), firstDayOfWeek.value)
+      : void 0
+  );
+});
+
 onIonViewDidEnter(async () => {
   appData.value = await appStorage.get(STORAGE_KEYS.APP_DATA);
   firstDayOfWeek.value = +(await appStorage.get(
@@ -189,13 +222,16 @@ onIonViewDidEnter(async () => {
   ));
   const initializeSwiperIndex = () => {
     const swiper = swiperRef.value?.swiper;
+    if (swiper?.activeIndex !== 0) {
+      return;
+    }
     if (!swiper) {
       setTimeout(() => {
         initializeSwiperIndex();
       });
       return;
     }
-    swiper.slideTo(swiper.slides.length - 1);
+    swiper.slideTo(pageCount.value - 1, 0);
   };
   initializeSwiperIndex();
 });
@@ -229,8 +265,16 @@ const addRoutine = async () => {
 };
 
 const handleSlideChange = ({ detail: [swiper] }: CustomEvent<[Swiper]>) => {
+  currentPageIndex.value = swiper?.activeIndex ?? 0;
   isFirstSlideActive.value = swiper.isBeginning;
   isLastSlideActive.value = swiper.isEnd;
+  if (swiper.isBeginning) {
+    pageCount.value++;
+    setTimeout(() => {
+      swiper?.virtual.update(false);
+      swiper?.slideTo(swiper.activeIndex + 1, 0);
+    });
+  }
 };
 
 const handleReorder = (event: CustomEvent<ItemReorderEventDetail>) => {
@@ -256,4 +300,7 @@ const createNewRoutine = (name: string): Routine => {
 const saveAppData = async () => {
   await appStorage.set(STORAGE_KEYS.APP_DATA, deepUnref(appData));
 };
+
+const getAdjustedDays = (weekOffset: number) =>
+  daysOfCurrentWeek.value.map((day) => day.add({ weeks: weekOffset }));
 </script>
