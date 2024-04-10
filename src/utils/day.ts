@@ -23,7 +23,7 @@ export function getFirstDayOfWeek(
   firstDayNumber: number
 ) {
   const firstDayOfWeek = date.add({
-    days: -1 * ((7 - (firstDayNumber - 1)) % 7),
+    days: -1 * ((7 + date.dayOfWeek - firstDayNumber) % 7),
   });
   return firstDayOfWeek;
 }
