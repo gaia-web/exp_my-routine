@@ -31,11 +31,9 @@
 
 <script setup lang="ts">
 import { Routine, RoutineRecord } from "@/utils/app-data";
-import { IonButton, IonInput, alertController } from "@ionic/vue";
+import { IonButton, IonInput, popoverController } from "@ionic/vue";
 import { Temporal } from "@js-temporal/polyfill";
-import { ref } from "vue";
-
-const locale = ref(navigator.language ?? "en-US");
+import RecordRoutinePopover from "@/components/RecordRoutinePopover.vue";
 
 defineProps({
   days: Array<Temporal.PlainDate>,
@@ -47,74 +45,16 @@ const routine = defineModel<Routine>("routine", {
 });
 
 const handleDayClicked = async (day: Temporal.PlainDate) => {
-  const value = routine.value.records[day.toString()]?.value;
-  const alert = await alertController.create({
-    header: `For ${routine.value.name}`,
-    subHeader: `on ${day.toLocaleString(locale.value)}`,
-    message: `What was the status of ${
-      routine.value.name
-    } on ${day.toLocaleString(locale.value)}?`,
-    inputs: [
-      {
-        label: "Positive",
-        type: "radio",
-        value: "+",
-        checked: value != null && value > 0,
-      },
-      {
-        label: "Neutral",
-        type: "radio",
-        value: "=",
-        checked: value != null && value == 0,
-      },
-      {
-        label: "Negative",
-        type: "radio",
-        value: "-",
-        checked: value != null && value < 0,
-      },
-    ],
-    buttons: [
-      {
-        text: "Cancel",
-        role: "cancel",
-      },
-      {
-        text: "Skip",
-        role: "destructive",
-        handler: () => {
-          const key = day.toString();
-          if (!routine.value.records[key]) {
-            routine.value.records[key] = {};
-          }
-          routine.value.records[key].value = undefined;
-        },
-      },
-      {
-        text: "Confirm",
-        role: "confirm",
-        handler: (value) => {
-          const key = day.toString();
-          if (!routine.value.records[key]) {
-            routine.value.records[key] = {};
-          }
-          switch (value) {
-            case "+":
-              routine.value.records[key].value = 1;
-              break;
-            case "-":
-              routine.value.records[key].value = -1;
-              break;
-            case "=":
-              routine.value.records[key].value = 0;
-              break;
-          }
-        },
-      },
-    ],
+  const popover = await popoverController.create({
+    component: RecordRoutinePopover,
+    componentProps: {
+      routine,
+      day,
+      dismiss: () => popover.dismiss(),
+    },
+    translucent: true,
   });
-
-  await alert.present();
+  await popover.present();
 };
 
 const getColor = (routineRecord?: RoutineRecord) => {
