@@ -13,8 +13,8 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       manifest: {
-        name: "My Routine",
-        short_name: "MyRoutine",
+        name: "Routines",
+        short_name: "Routines",
         start_url: "/",
         background_color: "#ffffff",
         icons: [
